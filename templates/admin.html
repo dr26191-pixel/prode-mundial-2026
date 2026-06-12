@@ -119,6 +119,16 @@
     </form>
   </div>
 
+  <!-- ── Sincronizar resultados ── -->
+  <div class="section">
+    <h2>🔄 Resultados automáticos</h2>
+    <p style="font-size:.85rem;color:var(--gray);margin-bottom:14px;">
+      Trae los resultados finales desde football-data.org y recalcula los puntos de todos los participantes.
+      Requiere la variable <code>FOOTBALL_DATA_KEY</code> en Render.
+    </p>
+    <a href="/admin/sync-resultados" class="btn btn-green">🔄 Sincronizar resultados reales</a>
+  </div>
+
   <!-- ── Lista de partidos ── -->
   <div class="section">
     <h2>⚽ Partidos cargados</h2>
@@ -154,16 +164,6 @@
     {% else %}
       <p class="no-data">No hay partidos cargados todavía.</p>
     {% endif %}
-  </div>
-
-  <!-- ── Sincronizar resultados ── -->
-  <div class="section">
-    <h2>🔄 Resultados automáticos</h2>
-    <p style="font-size:.85rem;color:var(--gray);margin-bottom:14px;">
-      Trae los resultados finales desde football-data.org y recalcula los puntos de todos los participantes.
-      Requiere la variable <code>FOOTBALL_DATA_KEY</code> en Render.
-    </p>
-    <a href="/admin/sync-resultados" class="btn btn-green">🔄 Sincronizar resultados reales</a>
   </div>
 
   <!-- ── Participantes ── -->
