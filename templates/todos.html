@@ -109,6 +109,15 @@
   {% for fase in fases_orden %}{% if fase in todas_fases %}
   <button class="filtro-btn" onclick="filtrar(this,'{{ fase }}')">{{ fase }}</button>
   {% endif %}{% endfor %}
+  <span style="margin-left:auto;font-size:.82rem;color:var(--gray);align-self:center;">
+    {% if ver_todos %}
+      Mostrando todos los partidos —
+      <a href="/todos" style="color:var(--green);font-weight:700;">Ver solo hasta hoy</a>
+    {% else %}
+      Mostrando partidos hasta hoy ({{ partidos|length }} de {{ total_partidos }}) —
+      <a href="/todos?todos=1" style="color:var(--green);font-weight:700;">Ver todos</a>
+    {% endif %}
+  </span>
 </div>
 
 <div class="leyenda">

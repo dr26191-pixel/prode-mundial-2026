@@ -221,9 +221,28 @@ def tabla():
     """))
     return render_template("tabla.html", tabla=rows)
 
+def _fecha_ord(fecha_str):
+    """Convierte '14/06 Grupo A' → número comparable 614. Sin fecha → 9999."""
+    try:
+        parte = fecha_str.split()[0]          # '14/06'
+        d, m  = parte.split("/")
+        return int(m) * 100 + int(d)
+    except Exception:
+        return 9999
+
 @app.route("/todos")
 def todos():
-    partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    ver_todos = request.args.get("todos") == "1"
+    hoy  = datetime.now()
+    hoy_ord = hoy.month * 100 + hoy.day
+
+    todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+
+    if ver_todos:
+        partidos = todos_partidos
+    else:
+        partidos = [p for p in todos_partidos if _fecha_ord(p.get("fecha") or "") <= hoy_ord]
+
     nombres  = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     p = placeholder()
@@ -232,7 +251,8 @@ def todos():
         prons[n] = {r["partido_id"]: r for r in fetchall(
             db_execute(f"SELECT * FROM pronosticos WHERE nombre={p}", (n,)))}
     return render_template("todos.html",
-                           partidos=partidos, nombres=nombres, pronosticos=prons)
+                           partidos=partidos, nombres=nombres, pronosticos=prons,
+                           ver_todos=ver_todos, total_partidos=len(todos_partidos))
 
 # ── Admin ─────────────────────────────────────────────────────────
 
