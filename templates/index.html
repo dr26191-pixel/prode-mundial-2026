@@ -224,17 +224,23 @@
       {% if partidos_fase %}
     <p class="section-title">{{ fase }}</p>
     {% for p in partidos_fase %}
-    {% set terminado = p.goles_local is not none and p.goles_visit is not none %}
-    <div class="partido {{ 'terminado' if terminado else '' }}">
+    <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
       <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
       <div>
-        {% if terminado %}
-          <div class="lock-badge">🔒 Terminado</div>
-          <div class="resultado-final">
-            <span class="score">{{ p.goles_local }}</span>
-            <span class="sep">–</span>
-            <span class="score">{{ p.goles_visit }}</span>
-          </div>
+        {% if p.bloqueado %}
+          {% if p.goles_local is not none and p.goles_visit is not none %}
+            <div class="lock-badge">🔒 Terminado</div>
+            <div class="resultado-final">
+              <span class="score">{{ p.goles_local }}</span>
+              <span class="sep">–</span>
+              <span class="score">{{ p.goles_visit }}</span>
+            </div>
+          {% else %}
+            <div class="lock-badge">🔒 Cerrado</div>
+            <div class="resultado-final" style="opacity:.45">
+              <span class="score">?</span><span class="sep">–</span><span class="score">?</span>
+            </div>
+          {% endif %}
         {% else %}
           <div class="fase-tag">{{ p.fase }}</div>
           <div class="score-inputs">
@@ -255,17 +261,23 @@
     {% for p in partidos %}
       {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
       {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
-    {% set terminado = p.goles_local is not none and p.goles_visit is not none %}
-    <div class="partido {{ 'terminado' if terminado else '' }}">
+    <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
       <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
       <div>
-        {% if terminado %}
-          <div class="lock-badge">🔒 Terminado</div>
-          <div class="resultado-final">
-            <span class="score">{{ p.goles_local }}</span>
-            <span class="sep">–</span>
-            <span class="score">{{ p.goles_visit }}</span>
-          </div>
+        {% if p.bloqueado %}
+          {% if p.goles_local is not none and p.goles_visit is not none %}
+            <div class="lock-badge">🔒 Terminado</div>
+            <div class="resultado-final">
+              <span class="score">{{ p.goles_local }}</span>
+              <span class="sep">–</span>
+              <span class="score">{{ p.goles_visit }}</span>
+            </div>
+          {% else %}
+            <div class="lock-badge">🔒 Cerrado</div>
+            <div class="resultado-final" style="opacity:.45">
+              <span class="score">?</span><span class="sep">–</span><span class="score">?</span>
+            </div>
+          {% endif %}
         {% else %}
           <div class="fase-tag">{{ p.fase }}</div>
           <div class="score-inputs">

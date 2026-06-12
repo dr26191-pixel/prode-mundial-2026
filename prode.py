@@ -91,9 +91,16 @@ ADMIN_PASSWORD      = os.environ.get("ADMIN_PASSWORD", "gipa2026")
 DATABASE_URL        = os.environ.get("DATABASE_URL")        # Render lo setea automáticamente
 FOOTBALL_DATA_KEY   = os.environ.get("FOOTBALL_DATA_KEY", "")
 FECHA_CIERRE        = "2026-06-15"   # pronósticos abiertos hasta este día inclusive
+_FECHA_LIMITE_ORD   = 615            # _fecha_ord("15/06 ...") = 615; < 616 = antes del 16/06
 
 def pronosticos_abiertos():
     return datetime.now().date() <= datetime.strptime(FECHA_CIERRE, "%Y-%m-%d").date()
+
+def partido_bloqueado(p):
+    """True si el partido ya tiene resultado O su fecha es anterior al 16/06."""
+    if p.get("goles_local") is not None:
+        return True
+    return _fecha_ord(p.get("fecha") or "") <= _FECHA_LIMITE_ORD
 
 # SQLite (local)
 DB = os.path.join(os.path.dirname(__file__), "prode.db")
@@ -241,8 +248,9 @@ def calcular_puntos(pl, pv, rl, rv):
 
 @app.route("/")
 def index():
-    cur = db_execute("SELECT * FROM partidos ORDER BY fecha, id")
-    partidos = fetchall(cur)
+    partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    for p in partidos:
+        p["bloqueado"] = partido_bloqueado(p)
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE)
 
@@ -261,9 +269,9 @@ def pronostico():
         if not key.startswith("local_"):
             continue
         pid = int(key.split("_", 1)[1])
-        # No guardar pronóstico si el partido ya tiene resultado
-        partido = fetchone(db_execute(f"SELECT goles_local FROM partidos WHERE id={p}", (pid,)))
-        if partido and partido["goles_local"] is not None:
+        # No guardar si el partido está bloqueado (resultado cargado o fecha < 16/06)
+        partido = fetchone(db_execute(f"SELECT * FROM partidos WHERE id={p}", (pid,)))
+        if partido and partido_bloqueado(partido):
             continue
         gl  = int(request.form.get(f"local_{pid}", 0) or 0)
         gv  = int(request.form.get(f"visit_{pid}", 0) or 0)
