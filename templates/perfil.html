@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil – {{ nombre }}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --azul: #74ACDF; --azul2: #4A90D9; --azul3: #2D6FA0;
+      --gold: #F6B40E; --gray: #5a5a5a; --light: #EEF5FC; --white: #fff;
+    }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111;
+           display: flex; flex-direction: column; min-height: 100vh; }
+    .header {
+      background: linear-gradient(180deg, var(--azul) 0%, var(--white) 50%, var(--azul) 100%);
+      border-bottom: 3px solid var(--azul2); padding: 14px 20px 0; text-align: center;
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 900; color: var(--azul3); }
+    .header p  { font-size: .82rem; color: var(--azul3); opacity: .8; margin-top: 2px; margin-bottom: 10px; }
+    .header-links { background: var(--azul2); margin: 0 -20px; padding: 7px 20px;
+                    display: flex; justify-content: center; gap: 10px; }
+    .header-links a { background: rgba(255,255,255,.18); color: #fff; text-decoration: none;
+      padding: 6px 14px; border-radius: 20px; font-size: .83rem; font-weight: 600;
+      border: 1px solid rgba(255,255,255,.3); }
+
+    .container { max-width: 420px; margin: 36px auto; padding: 0 16px 48px; }
+    .card { background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(45,111,160,.15); padding: 32px 28px; }
+
+    .flash { background: #dbeeff; border: 1px solid var(--azul); border-radius: 8px;
+             padding: 10px 14px; margin-bottom: 20px; font-size: .88rem; color: #1a5c8a; }
+
+    /* Avatar preview */
+    .avatar-wrap { text-align: center; margin-bottom: 24px; }
+    .avatar-circle {
+      width: 110px; height: 110px; border-radius: 50%; object-fit: cover;
+      border: 4px solid var(--azul2); margin: 0 auto 10px;
+      display: block; background: var(--light);
+    }
+    .avatar-initial {
+      width: 110px; height: 110px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul2), var(--azul3));
+      color: #fff; font-size: 2.8rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 10px; border: 4px solid var(--azul2);
+    }
+    .avatar-name { font-weight: 800; font-size: 1.1rem; color: var(--azul3); }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--azul); border-radius: 12px; padding: 20px;
+      text-align: center; cursor: pointer; transition: background .2s;
+      margin-bottom: 16px; background: var(--light);
+    }
+    .upload-zone:hover { background: #dbeeff; }
+    .upload-zone p { font-size: .88rem; color: var(--gray); margin-top: 6px; }
+    #file-input { display: none; }
+
+    .preview-wrap { text-align: center; margin-bottom: 16px; display: none; }
+    #preview-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+                   border: 3px solid var(--azul2); }
+
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 9px; font-size: 1rem;
+           font-weight: 700; cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg, var(--azul3), var(--azul2)); color: #fff; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .note { font-size: .75rem; color: var(--gray); text-align: center; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>📸 Foto de perfil</h1>
+  <p>{{ nombre }}</p>
+  <div class="header-links">
+    <a href="/mis-pronosticos/{{ nombre }}">← Mis pronósticos</a>
+    <a href="/tabla">🏆 Tabla</a>
+  </div>
+</div>
+
+<div class="container">
+  {% with msgs = get_flashed_messages() %}
+    {% if msgs %}<div class="flash">{{ msgs[0] }}</div>{% endif %}
+  {% endwith %}
+
+  <div class="card">
+    <div class="avatar-wrap">
+      {% if avatar %}
+        <img class="avatar-circle" src="{{ avatar }}" alt="{{ nombre }}">
+      {% else %}
+        <div class="avatar-initial">{{ nombre[0].upper() }}</div>
+      {% endif %}
+      <div class="avatar-name">{{ nombre }}</div>
+    </div>
+
+    <form method="POST" id="perfil-form">
+      <input type="hidden" name="avatar_data" id="avatar_data">
+
+      <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div style="font-size:2rem">📷</div>
+        <p>Hacé click para elegir una foto<br><small>JPG o PNG · se redimensiona automáticamente</small></p>
+      </div>
+      <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp">
+
+      <div class="preview-wrap" id="preview-wrap">
+        <img id="preview-img" src="" alt="Preview">
+        <p style="font-size:.82rem;color:var(--azul3);margin-top:6px;font-weight:700">Vista previa</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary" id="btn-guardar" disabled>
+        Guardar foto de perfil
+      </button>
+      <p class="note">La foto queda guardada en tu perfil y se ve en la tabla y pronósticos.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+const fileInput  = document.getElementById('file-input');
+const previewImg = document.getElementById('preview-img');
+const previewWrap= document.getElementById('preview-wrap');
+const avatarData = document.getElementById('avatar_data');
+const btnGuardar = document.getElementById('btn-guardar');
+
+fileInput.addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const SIZE = 160;
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if (w > h) { if (w > SIZE) { h = Math.round(h * SIZE / w); w = SIZE; } }
+      else        { if (h > SIZE) { w = Math.round(w * SIZE / h); h = SIZE; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      previewImg.src = dataUrl;
+      previewWrap.style.display = 'block';
+      avatarData.value = dataUrl;
+      btnGuardar.disabled = false;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+</script>
+</body>
+</html>

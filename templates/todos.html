@@ -65,8 +65,10 @@
     }
     tbody tr:nth-child(even) td.td-nombre { background:#f0f7ff; }
     tbody tr:hover td.td-nombre { background:#dbeeff !important; }
-    tbody td.td-nombre a { color:var(--azul3); text-decoration:none; font-weight:800; }
+    tbody td.td-nombre a { color:var(--azul3); text-decoration:none; font-weight:800; display:inline-flex; align-items:center; gap:7px; }
     tbody td.td-nombre a:hover { text-decoration:underline; }
+    .av { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid var(--azul); flex-shrink:0; }
+    .av-init { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,var(--azul2),var(--azul3)); color:#fff; font-size:.75rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; border:2px solid var(--azul); flex-shrink:0; }
 
     /* chips de predicción */
     .chip {
@@ -158,7 +160,16 @@
   <tbody>
     {% for nombre in nombres %}
     <tr>
-      <td class="td-nombre"><a href="/mis-pronosticos/{{ nombre }}">{{ nombre }}</a></td>
+      <td class="td-nombre">
+        <a href="/mis-pronosticos/{{ nombre }}">
+          {% if avatares.get(nombre) %}
+            <img class="av" src="{{ avatares[nombre] }}" alt="{{ nombre }}">
+          {% else %}
+            <span class="av-init">{{ nombre[0].upper() }}</span>
+          {% endif %}
+          {{ nombre }}
+        </a>
+      </td>
       {% for p in partidos %}
       <td data-fase="{{ p.fase }}">
         {% if p.id in pronosticos[nombre] %}

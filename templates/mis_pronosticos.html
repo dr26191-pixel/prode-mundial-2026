@@ -52,12 +52,22 @@
 </head>
 <body>
 <div class="header">
-  <h1>⚽ Pronósticos de {{ nombre }}</h1>
-  <p>Prode Mundial 2026</p>
-  <div class="header-links">
+  <div style="display:flex;align-items:center;justify-content:center;gap:14px;padding-top:12px;">
+    {% if avatar %}
+      <img src="{{ avatar }}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.6);" alt="{{ nombre }}">
+    {% else %}
+      <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.5);">{{ nombre[0].upper() }}</div>
+    {% endif %}
+    <div>
+      <h1 style="font-size:1.25rem;font-weight:900;">⚽ Pronósticos de {{ nombre }}</h1>
+      <p style="font-size:.82rem;opacity:.8;margin-top:2px;">Prode Mundial 2026</p>
+    </div>
+  </div>
+  <div class="header-links" style="margin-top:10px;">
     <a href="/">🏠 Inicio</a>
     <a href="/tabla">🏆 Tabla</a>
     <a href="/todos">👥 Todos</a>
+    <a href="/perfil/{{ nombre }}">📸 Mi foto</a>
   </div>
 </div>
 

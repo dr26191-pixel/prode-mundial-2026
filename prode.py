@@ -186,6 +186,12 @@ def init_db():
                 UNIQUE(nombre, partido_id)
             )
         """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS usuarios (
+                nombre TEXT PRIMARY KEY,
+                avatar TEXT
+            )
+        """)
         conn.commit()
         conn.close()
     else:
@@ -210,6 +216,10 @@ def init_db():
                 goles_visit INTEGER NOT NULL DEFAULT 0,
                 puntos      INTEGER,
                 UNIQUE(nombre, partido_id)
+            );
+            CREATE TABLE IF NOT EXISTS usuarios (
+                nombre TEXT PRIMARY KEY,
+                avatar TEXT
             );
         """)
         conn.commit()
@@ -270,8 +280,38 @@ def mis_pronosticos(nombre):
     pron_rows = fetchall(db_execute(
         f"SELECT * FROM pronosticos WHERE nombre={p}", (nombre,)))
     pron = {r["partido_id"]: r for r in pron_rows}
+    usuario = fetchone(db_execute(f"SELECT avatar FROM usuarios WHERE nombre={p}", (nombre,)))
+    avatar  = usuario["avatar"] if usuario and usuario.get("avatar") else None
     return render_template("mis_pronosticos.html",
-                           nombre=nombre, partidos=partidos, pronosticos=pron)
+                           nombre=nombre, partidos=partidos, pronosticos=pron, avatar=avatar)
+
+
+@app.route("/perfil/<nombre>", methods=["GET", "POST"])
+def perfil(nombre):
+    p = placeholder()
+    if request.method == "POST":
+        avatar_data = request.form.get("avatar_data", "").strip()
+        if avatar_data and avatar_data.startswith("data:image"):
+            # Limitar a ~200KB
+            if len(avatar_data) <= 204800:
+                db_execute(f"""
+                    INSERT INTO usuarios (nombre, avatar) VALUES ({p},{p})
+                    ON CONFLICT(nombre) DO UPDATE SET avatar=EXCLUDED.avatar
+                """, (nombre, avatar_data))
+                db_commit()
+                flash("Foto de perfil actualizada.")
+            else:
+                flash("La imagen es demasiado grande. Usá una foto más pequeña.")
+        return redirect(url_for("mis_pronosticos", nombre=nombre))
+    usuario = fetchone(db_execute(f"SELECT avatar FROM usuarios WHERE nombre={p}", (nombre,)))
+    avatar  = usuario["avatar"] if usuario and usuario.get("avatar") else None
+    return render_template("perfil.html", nombre=nombre, avatar=avatar)
+
+def _avatares():
+    """Devuelve dict {nombre: avatar_data_url} para todos los usuarios con foto."""
+    return {r["nombre"]: r["avatar"] for r in fetchall(
+        db_execute("SELECT nombre, avatar FROM usuarios WHERE avatar IS NOT NULL"))}
+
 
 @app.route("/tabla")
 def tabla():
@@ -286,7 +326,7 @@ def tabla():
         GROUP  BY nombre
         ORDER  BY total DESC, exactos DESC
     """))
-    return render_template("tabla.html", tabla=rows)
+    return render_template("tabla.html", tabla=rows, avatares=_avatares())
 
 def _fecha_ord(fecha_str):
     """Convierte '14/06 Grupo A' → número comparable 614. Sin fecha → 9999."""
@@ -319,7 +359,8 @@ def todos():
             db_execute(f"SELECT * FROM pronosticos WHERE nombre={p}", (n,)))}
     return render_template("todos.html",
                            partidos=partidos, nombres=nombres, pronosticos=prons,
-                           ver_todos=ver_todos, total_partidos=len(todos_partidos))
+                           ver_todos=ver_todos, total_partidos=len(todos_partidos),
+                           avatares=_avatares())
 
 # ── Admin ─────────────────────────────────────────────────────────
 
