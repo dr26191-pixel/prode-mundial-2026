@@ -319,6 +319,66 @@ def todos():
 
 # ── Admin ─────────────────────────────────────────────────────────
 
+def _do_sync_resultados():
+    """Trae partidos terminados de football-data.org y actualiza DB. Retorna mensaje."""
+    if not FOOTBALL_DATA_KEY:
+        return None
+    try:
+        req = urllib.request.Request(
+            "https://api.football-data.org/v4/competitions/WC/matches?status=FINISHED",
+            headers={"X-Auth-Token": FOOTBALL_DATA_KEY}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read())
+
+        p = placeholder()
+        actualizados = 0
+        sin_mapeo = []
+        sin_partido = []
+        terminados = [m for m in data.get("matches", [])
+                      if m.get("score", {}).get("winner") is not None]
+
+        for m in terminados:
+            ft = m.get("score", {}).get("fullTime", {})
+            gl = ft.get("home")
+            gv = ft.get("away")
+            if gl is None or gv is None:
+                continue
+            home_en = m.get("homeTeam", {}).get("name", "")
+            away_en = m.get("awayTeam", {}).get("name", "")
+            home_es = NOMBRES_API.get(home_en, "")
+            away_es = NOMBRES_API.get(away_en, "")
+            if not home_es or not away_es:
+                sin_mapeo.append(f"{home_en} vs {away_en}")
+                continue
+            partido = fetchone(db_execute(
+                f"SELECT * FROM partidos WHERE equipo_local={p} AND equipo_visit={p}",
+                (home_es, away_es)))
+            if not partido:
+                sin_partido.append(f"{home_es} vs {away_es}")
+                continue
+            if partido["goles_local"] == gl and partido["goles_visit"] == gv:
+                continue
+            db_execute(
+                f"UPDATE partidos SET goles_local={p}, goles_visit={p} WHERE id={p}",
+                (gl, gv, partido["id"]))
+            for pron in fetchall(db_execute(
+                    f"SELECT * FROM pronosticos WHERE partido_id={p}", (partido["id"],))):
+                pts = calcular_puntos(pron["goles_local"], pron["goles_visit"], gl, gv)
+                db_execute(f"UPDATE pronosticos SET puntos={p} WHERE id={p}", (pts, pron["id"]))
+            actualizados += 1
+
+        db_commit()
+        msg = f"Auto-sync: {actualizados} partido(s) actualizado(s) de {len(terminados)} terminado(s)."
+        if sin_mapeo:
+            msg += f" Sin mapeo: {', '.join(sin_mapeo[:3])}."
+        if sin_partido:
+            msg += f" No encontrados en DB: {', '.join(sin_partido[:3])}."
+        return msg
+    except Exception as e:
+        return f"Error al sincronizar: {e}"
+
+
 @app.route("/admin", methods=["GET", "POST"])
 def admin():
     if request.method == "POST" and "password" in request.form:
@@ -328,6 +388,10 @@ def admin():
             flash("Contraseña incorrecta.")
     if not session.get("admin"):
         return render_template("admin_login.html")
+    # Auto-sync al abrir el panel
+    msg = _do_sync_resultados()
+    if msg:
+        flash(msg)
     partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     participantes = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
@@ -464,60 +528,9 @@ def sync_resultados():
     if not FOOTBALL_DATA_KEY:
         flash("Configurá la variable FOOTBALL_DATA_KEY en Render para usar esta función.")
         return redirect(url_for("admin"))
-    try:
-        req = urllib.request.Request(
-            "https://api.football-data.org/v4/competitions/WC/matches?status=FINISHED",
-            headers={"X-Auth-Token": FOOTBALL_DATA_KEY}
-        )
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            data = json.loads(resp.read())
-
-        p = placeholder()
-        actualizados = 0
-        sin_mapeo = []
-        sin_partido = []
-        matches = data.get("matches", [])
-        terminados = [m for m in matches if m.get("score", {}).get("winner") is not None]
-
-        for m in terminados:
-            ft = m.get("score", {}).get("fullTime", {})
-            gl = ft.get("home")
-            gv = ft.get("away")
-            if gl is None or gv is None:
-                continue
-            home_en = m.get("homeTeam", {}).get("name", "")
-            away_en = m.get("awayTeam", {}).get("name", "")
-            home_es = NOMBRES_API.get(home_en, "")
-            away_es = NOMBRES_API.get(away_en, "")
-            if not home_es or not away_es:
-                sin_mapeo.append(f"{home_en} vs {away_en}")
-                continue
-            partido = fetchone(db_execute(
-                f"SELECT * FROM partidos WHERE equipo_local={p} AND equipo_visit={p}",
-                (home_es, away_es)))
-            if not partido:
-                sin_partido.append(f"{home_es} vs {away_es}")
-                continue
-            if partido["goles_local"] == gl and partido["goles_visit"] == gv:
-                continue
-            db_execute(
-                f"UPDATE partidos SET goles_local={p}, goles_visit={p} WHERE id={p}",
-                (gl, gv, partido["id"]))
-            for pron in fetchall(db_execute(
-                    f"SELECT * FROM pronosticos WHERE partido_id={p}", (partido["id"],))):
-                pts = calcular_puntos(pron["goles_local"], pron["goles_visit"], gl, gv)
-                db_execute(f"UPDATE pronosticos SET puntos={p} WHERE id={p}", (pts, pron["id"]))
-            actualizados += 1
-
-        db_commit()
-        msg = f"Sincronizado: {actualizados} partido(s) actualizado(s) de {len(terminados)} terminado(s)."
-        if sin_mapeo:
-            msg += f" Sin mapeo: {', '.join(sin_mapeo[:3])}."
-        if sin_partido:
-            msg += f" No encontrados en DB: {', '.join(sin_partido[:3])}."
+    msg = _do_sync_resultados()
+    if msg:
         flash(msg)
-    except Exception as e:
-        flash(f"Error al sincronizar: {e}")
     return redirect(url_for("admin"))
 
 
