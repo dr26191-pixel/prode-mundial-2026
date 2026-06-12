@@ -8,6 +8,23 @@ from flask import (Flask, render_template, request, redirect,
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prode-mundial-2026")
 
+BANDERAS = {
+    "Argentina": "🇦🇷", "Argelia": "🇩🇿", "Australia": "🇦🇺", "Austria": "🇦🇹",
+    "Arabia Saudita": "🇸🇦", "Alemania": "🇩🇪", "Bélgica": "🇧🇪", "Bosnia": "🇧🇦",
+    "Brasil": "🇧🇷", "Canadá": "🇨🇦", "Cabo Verde": "🇨🇻", "Colombia": "🇨🇴",
+    "Corea del Sur": "🇰🇷", "Costa de Marfil": "🇨🇮", "Croacia": "🇭🇷",
+    "Curazao": "🇨🇼", "Ecuador": "🇪🇨", "EE.UU.": "🇺🇸", "Egipto": "🇪🇬",
+    "Escocia": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "España": "🇪🇸", "Francia": "🇫🇷", "Ghana": "🇬🇭",
+    "Haití": "🇭🇹", "Inglaterra": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Irak": "🇮🇶", "Irán": "🇮🇷",
+    "Japón": "🇯🇵", "Jordania": "🇯🇴", "Marruecos": "🇲🇦", "México": "🇲🇽",
+    "Nueva Zelanda": "🇳🇿", "Noruega": "🇳🇴", "Países Bajos": "🇳🇱",
+    "Panamá": "🇵🇦", "Paraguay": "🇵🇾", "Portugal": "🇵🇹", "Qatar": "🇶🇦",
+    "Rep. Checa": "🇨🇿", "República Checa": "🇨🇿", "Rep. Dem. Congo": "🇨🇩",
+    "Senegal": "🇸🇳", "Sudáfrica": "🇿🇦", "Suecia": "🇸🇪", "Suiza": "🇨🇭",
+    "Túnez": "🇹🇳", "Turquía": "🇹🇷", "Uruguay": "🇺🇾", "Uzbekistán": "🇺🇿",
+}
+app.jinja_env.globals["banderas"] = BANDERAS
+
 ADMIN_PASSWORD  = os.environ.get("ADMIN_PASSWORD", "gipa2026")
 DATABASE_URL    = os.environ.get("DATABASE_URL")   # Render lo setea automáticamente
 

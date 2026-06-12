@@ -153,7 +153,7 @@
     <p class="section-title">{{ fase }}</p>
     {% for p in partidos_fase %}
     <div class="partido">
-      <div class="equipo local">{{ p.equipo_local }}</div>
+      <div class="equipo local">{{ banderas.get(p.equipo_local, '') }} {{ p.equipo_local }}</div>
       <div>
         <div class="fase-tag">{{ p.fase }}</div>
         <div class="score-inputs">
@@ -163,7 +163,7 @@
         </div>
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
-      <div class="equipo visit">{{ p.equipo_visit }}</div>
+      <div class="equipo visit">{{ p.equipo_visit }} {{ banderas.get(p.equipo_visit, '') }}</div>
     </div>
     {% endfor %}
       {% endif %}
@@ -174,7 +174,7 @@
       {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
       {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
     <div class="partido">
-      <div class="equipo local">{{ p.equipo_local }}</div>
+      <div class="equipo local">{{ banderas.get(p.equipo_local, '') }} {{ p.equipo_local }}</div>
       <div>
         <div class="fase-tag">{{ p.fase }}</div>
         <div class="score-inputs">
@@ -184,7 +184,7 @@
         </div>
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
-      <div class="equipo visit">{{ p.equipo_visit }}</div>
+      <div class="equipo visit">{{ p.equipo_visit }} {{ banderas.get(p.equipo_visit, '') }}</div>
     </div>
       {% endif %}
     {% endfor %}

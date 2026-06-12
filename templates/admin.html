@@ -126,7 +126,7 @@
       {% for p in partidos %}
       <div class="partido-row">
         <div class="partido-info">
-          <div class="teams">{{ p.equipo_local }} vs {{ p.equipo_visit }}</div>
+          <div class="teams">{{ banderas.get(p.equipo_local, '') }} {{ p.equipo_local }} vs {{ p.equipo_visit }} {{ banderas.get(p.equipo_visit, '') }}</div>
           <div class="meta">{{ p.fase }}{% if p.fecha %} · {{ p.fecha }}{% endif %}</div>
           {% if p.goles_local is not none and p.goles_visit is not none %}
           <div class="resultado">Resultado: {{ p.goles_local }} – {{ p.goles_visit }}</div>
