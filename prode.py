@@ -474,23 +474,29 @@ def sync_resultados():
 
         p = placeholder()
         actualizados = 0
-        for m in data.get("matches", []):
-            score = m.get("score", {})
-            if score.get("winner") is None:
-                continue
-            ft = score.get("fullTime", {})
+        sin_mapeo = []
+        sin_partido = []
+        matches = data.get("matches", [])
+        terminados = [m for m in matches if m.get("score", {}).get("winner") is not None]
+
+        for m in terminados:
+            ft = m.get("score", {}).get("fullTime", {})
             gl = ft.get("home")
             gv = ft.get("away")
             if gl is None or gv is None:
                 continue
-            home_es = NOMBRES_API.get(m.get("homeTeam", {}).get("name", ""), "")
-            away_es = NOMBRES_API.get(m.get("awayTeam", {}).get("name", ""), "")
+            home_en = m.get("homeTeam", {}).get("name", "")
+            away_en = m.get("awayTeam", {}).get("name", "")
+            home_es = NOMBRES_API.get(home_en, "")
+            away_es = NOMBRES_API.get(away_en, "")
             if not home_es or not away_es:
+                sin_mapeo.append(f"{home_en} vs {away_en}")
                 continue
             partido = fetchone(db_execute(
                 f"SELECT * FROM partidos WHERE equipo_local={p} AND equipo_visit={p}",
                 (home_es, away_es)))
             if not partido:
+                sin_partido.append(f"{home_es} vs {away_es}")
                 continue
             if partido["goles_local"] == gl and partido["goles_visit"] == gv:
                 continue
@@ -504,7 +510,12 @@ def sync_resultados():
             actualizados += 1
 
         db_commit()
-        flash(f"Sincronizado: {actualizados} partido(s) actualizado(s).")
+        msg = f"Sincronizado: {actualizados} partido(s) actualizado(s) de {len(terminados)} terminado(s)."
+        if sin_mapeo:
+            msg += f" Sin mapeo: {', '.join(sin_mapeo[:3])}."
+        if sin_partido:
+            msg += f" No encontrados en DB: {', '.join(sin_partido[:3])}."
+        flash(msg)
     except Exception as e:
         flash(f"Error al sincronizar: {e}")
     return redirect(url_for("admin"))
