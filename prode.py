@@ -29,6 +29,27 @@ FLAG_CODES = {
     "Uzbekistán": "uz",
 }
 
+SIGLAS = {
+    "Argentina": "ARG",  "Argelia": "ALG",    "Australia": "AUS",
+    "Austria": "AUT",    "Arabia Saudita": "KSA", "Alemania": "ALE",
+    "Bélgica": "BEL",    "Bosnia": "BIH",     "Brasil": "BRA",
+    "Canadá": "CAN",     "Cabo Verde": "CPV", "Colombia": "COL",
+    "Corea del Sur": "COR","Costa de Marfil": "CIV","Croacia": "CRO",
+    "Curazao": "CUW",    "Ecuador": "ECU",    "EE.UU.": "USA",
+    "Egipto": "EGY",     "Escocia": "SCO",    "España": "ESP",
+    "Francia": "FRA",    "Ghana": "GHA",      "Haití": "HAI",
+    "Inglaterra": "ING", "Irak": "IRQ",       "Irán": "IRN",
+    "Japón": "JPN",      "Jordania": "JOR",   "Marruecos": "MAR",
+    "México": "MEX",     "Nueva Zelanda": "NZL","Noruega": "NOR",
+    "Países Bajos": "NED","Panamá": "PAN",    "Paraguay": "PAR",
+    "Portugal": "POR",   "Qatar": "QAT",      "Rep. Checa": "CZE",
+    "República Checa": "CZE","Rep. Dem. Congo": "COD","Senegal": "SEN",
+    "Sudáfrica": "RSA",  "Suecia": "SUE",     "Suiza": "SUI",
+    "Túnez": "TUN",      "Turquía": "TUR",    "Uruguay": "URU",
+    "Uzbekistán": "UZB",
+}
+app.jinja_env.globals["siglas"] = SIGLAS
+
 def bandera_img(nombre, size=24):
     code = FLAG_CODES.get(nombre)
     if not code:
