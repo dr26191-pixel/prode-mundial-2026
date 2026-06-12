@@ -91,8 +91,8 @@
 
     .rank { font-weight: 900; color: var(--gray); font-size: .95rem; }
     .nombre-link { font-weight: 700; color: var(--azul3); text-decoration: none; font-size: 1rem; display:inline-flex; align-items:center; gap:8px; }
-    .av { width:32px; height:32px; border-radius:50%; object-fit:cover; border:2px solid var(--azul); flex-shrink:0; }
-    .av-init { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--azul2),var(--azul3)); color:#fff; font-size:.85rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; border:2px solid var(--azul); flex-shrink:0; }
+    .av { width:52px; height:52px; border-radius:50%; object-fit:cover; border:3px solid var(--azul); flex-shrink:0; }
+    .av-init { width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,var(--azul2),var(--azul3)); color:#fff; font-size:1.2rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; border:3px solid var(--azul); flex-shrink:0; }
     .nombre-link:hover { text-decoration: underline; }
     .pts-col { font-weight: 900; font-size: 1.2rem; color: var(--azul3); }
     .badge { border-radius: 6px; padding: 3px 10px; font-weight: 800; font-size: .88rem; display: inline-block; }
@@ -130,9 +130,9 @@
     <div class="podio-item pos2">
       <div class="corona">🥈</div>
       {% if avatares.get(tabla[1].nombre) %}
-        <img src="{{ avatares[tabla[1].nombre] }}" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:3px solid var(--azul2);margin:4px auto 6px;display:block;">
+        <img src="{{ avatares[tabla[1].nombre] }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:4px solid var(--azul2);margin:4px auto 6px;display:block;">
       {% else %}
-        <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;font-size:1.4rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:3px solid var(--azul2);">{{ tabla[1].nombre[0].upper() }}</div>
+        <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--azul),var(--azul2));color:#fff;font-size:2rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:4px solid var(--azul2);">{{ tabla[1].nombre[0].upper() }}</div>
       {% endif %}
       <div class="nombre">{{ tabla[1].nombre }}</div>
       <div class="pts">{{ tabla[1].total }}</div>
@@ -142,9 +142,9 @@
     <div class="podio-item pos1">
       <div class="corona">🥇</div>
       {% if avatares.get(tabla[0].nombre) %}
-        <img src="{{ avatares[tabla[0].nombre] }}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);margin:4px auto 6px;display:block;">
+        <img src="{{ avatares[tabla[0].nombre] }}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid var(--gold);margin:4px auto 6px;display:block;box-shadow:0 4px 16px rgba(246,180,14,.4);">
       {% else %}
-        <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4940a);color:#333;font-size:1.6rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:3px solid var(--gold);">{{ tabla[0].nombre[0].upper() }}</div>
+        <div style="width:96px;height:96px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#d4940a);color:#333;font-size:2.4rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:4px solid var(--gold);box-shadow:0 4px 16px rgba(246,180,14,.4);">{{ tabla[0].nombre[0].upper() }}</div>
       {% endif %}
       <div class="nombre">{{ tabla[0].nombre }}</div>
       <div class="pts">{{ tabla[0].total }}</div>
@@ -154,9 +154,9 @@
     <div class="podio-item pos3">
       <div class="corona">🥉</div>
       {% if avatares.get(tabla[2].nombre) %}
-        <img src="{{ avatares[tabla[2].nombre] }}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:3px solid #cd7f32;margin:4px auto 6px;display:block;">
+        <img src="{{ avatares[tabla[2].nombre] }}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:4px solid #cd7f32;margin:4px auto 6px;display:block;">
       {% else %}
-        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#cd7f32,#a0611f);color:#fff;font-size:1.3rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:3px solid #cd7f32;">{{ tabla[2].nombre[0].upper() }}</div>
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#cd7f32,#a0611f);color:#fff;font-size:1.8rem;font-weight:900;display:flex;align-items:center;justify-content:center;margin:4px auto 6px;border:4px solid #cd7f32;">{{ tabla[2].nombre[0].upper() }}</div>
       {% endif %}
       <div class="nombre">{{ tabla[2].nombre }}</div>
       <div class="pts">{{ tabla[2].total }}</div>
