@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prode Mundial 2026</title>
+  <title>Prode GiPA Argentina Mundial 2026</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -19,32 +19,32 @@
     }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--dark); }
 
-    /* ── Header ── */
+    /* ── Header fijo ── */
     .header {
       background: linear-gradient(180deg, var(--azul) 0%, var(--white) 50%, var(--azul) 100%);
       color: var(--azul3);
       padding: 0;
-      position: relative;
-      overflow: hidden;
+      position: sticky; top: 0; z-index: 100;
       border-bottom: 4px solid var(--azul2);
+      box-shadow: 0 3px 12px rgba(45,111,160,.25);
     }
     .header-inner {
       display: flex; align-items: center; justify-content: space-between;
-      max-width: 900px; margin: 0 auto; padding: 16px 20px 12px;
+      max-width: 900px; margin: 0 auto; padding: 12px 20px 8px;
       gap: 12px;
     }
-    .header-logo img { height: 64px; width: auto; }
+    .header-logo img { height: 80px; width: auto; }
     .header-titulo { flex: 1; text-align: center; }
     .header-titulo h1 {
-      font-size: 1.6rem; font-weight: 900; letter-spacing: .03em;
+      font-size: 1.45rem; font-weight: 900; letter-spacing: .02em;
       color: var(--azul3); text-shadow: 0 1px 0 rgba(255,255,255,.8);
     }
     .header-titulo h1 span { color: var(--gold); }
-    .header-titulo p { font-size: .82rem; color: var(--azul3); opacity: .85; margin-top: 3px; }
-    .header-messi { height: 110px; width: auto; display: block; object-fit: contain;
-                    filter: drop-shadow(2px 2px 4px rgba(0,0,0,.2)); }
+    .header-titulo p { font-size: .8rem; color: var(--azul3); opacity: .85; margin-top: 3px; }
+    .header-messi { height: 140px; width: auto; display: block; object-fit: contain;
+                    filter: drop-shadow(2px 3px 5px rgba(0,0,0,.25)); }
     .header-links {
-      background: var(--azul2); padding: 8px 20px;
+      background: var(--azul2); padding: 7px 20px;
       display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
     .header-links a {
@@ -146,7 +146,7 @@
       <img src="/static/Logo_gipa.png" alt="GiPA Argentina">
     </div>
     <div class="header-titulo">
-      <h1>⚽ Prode <span>Mundial 2026</span></h1>
+      <h1>⚽ Prode <span>GiPA Argentina</span> Mundial 2026</h1>
       <p>Ingresá tu pronóstico para cada partido</p>
     </div>
     <img class="header-messi" src="/static/messi.png" alt="Messi"
