@@ -8,22 +8,37 @@ from flask import (Flask, render_template, request, redirect,
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "prode-mundial-2026")
 
-BANDERAS = {
-    "Argentina": "🇦🇷", "Argelia": "🇩🇿", "Australia": "🇦🇺", "Austria": "🇦🇹",
-    "Arabia Saudita": "🇸🇦", "Alemania": "🇩🇪", "Bélgica": "🇧🇪", "Bosnia": "🇧🇦",
-    "Brasil": "🇧🇷", "Canadá": "🇨🇦", "Cabo Verde": "🇨🇻", "Colombia": "🇨🇴",
-    "Corea del Sur": "🇰🇷", "Costa de Marfil": "🇨🇮", "Croacia": "🇭🇷",
-    "Curazao": "🇨🇼", "Ecuador": "🇪🇨", "EE.UU.": "🇺🇸", "Egipto": "🇪🇬",
-    "Escocia": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "España": "🇪🇸", "Francia": "🇫🇷", "Ghana": "🇬🇭",
-    "Haití": "🇭🇹", "Inglaterra": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Irak": "🇮🇶", "Irán": "🇮🇷",
-    "Japón": "🇯🇵", "Jordania": "🇯🇴", "Marruecos": "🇲🇦", "México": "🇲🇽",
-    "Nueva Zelanda": "🇳🇿", "Noruega": "🇳🇴", "Países Bajos": "🇳🇱",
-    "Panamá": "🇵🇦", "Paraguay": "🇵🇾", "Portugal": "🇵🇹", "Qatar": "🇶🇦",
-    "Rep. Checa": "🇨🇿", "República Checa": "🇨🇿", "Rep. Dem. Congo": "🇨🇩",
-    "Senegal": "🇸🇳", "Sudáfrica": "🇿🇦", "Suecia": "🇸🇪", "Suiza": "🇨🇭",
-    "Túnez": "🇹🇳", "Turquía": "🇹🇷", "Uruguay": "🇺🇾", "Uzbekistán": "🇺🇿",
+# Códigos ISO para flagcdn.com (gb-sct / gb-eng para Escocia e Inglaterra)
+FLAG_CODES = {
+    "Argentina": "ar",    "Argelia": "dz",       "Australia": "au",
+    "Austria": "at",      "Arabia Saudita": "sa", "Alemania": "de",
+    "Bélgica": "be",      "Bosnia": "ba",         "Brasil": "br",
+    "Canadá": "ca",       "Cabo Verde": "cv",     "Colombia": "co",
+    "Corea del Sur": "kr","Costa de Marfil": "ci","Croacia": "hr",
+    "Curazao": "cw",      "Ecuador": "ec",        "EE.UU.": "us",
+    "Egipto": "eg",       "Escocia": "gb-sct",    "España": "es",
+    "Francia": "fr",      "Ghana": "gh",          "Haití": "ht",
+    "Inglaterra": "gb-eng","Irak": "iq",          "Irán": "ir",
+    "Japón": "jp",        "Jordania": "jo",       "Marruecos": "ma",
+    "México": "mx",       "Nueva Zelanda": "nz",  "Noruega": "no",
+    "Países Bajos": "nl", "Panamá": "pa",         "Paraguay": "py",
+    "Portugal": "pt",     "Qatar": "qa",          "Rep. Checa": "cz",
+    "República Checa": "cz","Rep. Dem. Congo": "cd","Senegal": "sn",
+    "Sudáfrica": "za",    "Suecia": "se",         "Suiza": "ch",
+    "Túnez": "tn",        "Turquía": "tr",        "Uruguay": "uy",
+    "Uzbekistán": "uz",
 }
-app.jinja_env.globals["banderas"] = BANDERAS
+
+def bandera_img(nombre, size=24):
+    code = FLAG_CODES.get(nombre)
+    if not code:
+        return ""
+    return (f'<img src="https://flagcdn.com/w40/{code}.png" '
+            f'width="{size}" height="{round(size*0.67)}" '
+            f'alt="{nombre}" style="vertical-align:middle;border-radius:2px;">')
+
+app.jinja_env.globals["bandera_img"] = bandera_img
+app.jinja_env.globals["banderas"]    = FLAG_CODES  # por si algún template usa banderas.get()
 
 ADMIN_PASSWORD  = os.environ.get("ADMIN_PASSWORD", "gipa2026")
 DATABASE_URL    = os.environ.get("DATABASE_URL")   # Render lo setea automáticamente

@@ -137,7 +137,7 @@
       <th class="th-partido" data-fase="{{ p.fase }}"
           title="{{ p.equipo_local }} vs {{ p.equipo_visit }}">
         <div class="th-flags">
-          {{ banderas.get(p.equipo_local, '?') }}&nbsp;vs&nbsp;{{ banderas.get(p.equipo_visit, '?') }}
+          {{ bandera_img(p.equipo_local, 20) | safe }}&nbsp;vs&nbsp;{{ bandera_img(p.equipo_visit, 20) | safe }}
         </div>
         {% if p.goles_local is not none and p.goles_visit is not none %}
         <div class="th-resultado">{{ p.goles_local }}–{{ p.goles_visit }}</div>
