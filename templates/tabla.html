@@ -17,45 +17,58 @@
     }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
 
-    /* ── Header ── */
+    /* ── Header fijo ── */
     .header {
       background: linear-gradient(180deg, var(--azul) 0%, var(--white) 50%, var(--azul) 100%);
-      border-bottom: 3px solid var(--azul2);
-      padding: 16px 20px 0;
-      text-align: center;
+      color: var(--azul3);
+      padding: 0;
       position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 3px 12px rgba(45,111,160,.2);
+      border-bottom: 4px solid var(--azul2);
+      box-shadow: 0 3px 12px rgba(45,111,160,.25);
     }
-    .header h1 { font-size: 1.3rem; font-weight: 900; color: var(--azul3); }
-    .header p  { font-size: .82rem; color: var(--azul3); opacity: .8; margin-top: 2px; margin-bottom: 12px; }
+    .header-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto; padding: 12px 20px 8px;
+      gap: 12px;
+    }
+    .header-logo img { height: 80px; width: auto; }
+    .header-titulo { flex: 1; text-align: center; }
+    .header-titulo h1 {
+      font-size: 1.45rem; font-weight: 900; letter-spacing: .02em;
+      color: var(--azul3); text-shadow: 0 1px 0 rgba(255,255,255,.8);
+    }
+    .header-titulo h1 span { color: var(--gold); }
+    .header-titulo p { font-size: .8rem; color: var(--azul3); opacity: .85; margin-top: 3px; }
+    .header-messi { height: 140px; width: auto; display: block; object-fit: contain;
+                    filter: drop-shadow(2px 3px 5px rgba(0,0,0,.25)); }
     .header-links {
-      background: var(--azul2); margin: 0 -20px; padding: 8px 20px;
+      background: var(--azul2); padding: 7px 20px;
       display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
     }
     .header-links a {
-      background: rgba(255,255,255,.18); color: #fff; text-decoration: none;
-      padding: 6px 16px; border-radius: 20px; font-size: .83rem; font-weight: 600;
+      background: rgba(255,255,255,.18); color: var(--white); text-decoration: none;
+      padding: 6px 16px; border-radius: 20px; font-size: .85rem; font-weight: 600;
       border: 1px solid rgba(255,255,255,.3);
     }
     .header-links a:hover { background: rgba(255,255,255,.32); }
 
-    .container { max-width: 660px; margin: 0 auto; padding: 28px 16px 48px; }
+    .container { max-width: 860px; margin: 0 auto; padding: 28px 16px 48px; }
 
     /* ── Podio ── */
-    .podio { display: flex; justify-content: center; align-items: flex-end; gap: 12px; margin-bottom: 32px; }
-    .podio-item { text-align: center; flex: 1; max-width: 150px; }
-    .podio-item .corona { font-size: 1.8rem; }
-    .podio-item .nombre { font-weight: 800; font-size: .92rem; margin: 4px 0; word-break: break-word; color: var(--azul3); }
-    .podio-item .pts { font-size: 1.5rem; font-weight: 900; }
-    .podio-item .pts-label { font-size: .72rem; color: var(--gray); margin-top: 1px; }
+    .podio { display: flex; justify-content: center; align-items: flex-end; gap: 16px; margin-bottom: 36px; }
+    .podio-item { text-align: center; flex: 1; max-width: 200px; }
+    .podio-item .corona { font-size: 2rem; }
+    .podio-item .nombre { font-weight: 800; font-size: 1rem; margin: 6px 0 2px; word-break: break-word; color: var(--azul3); }
+    .podio-item .pts { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+    .podio-item .pts-label { font-size: .72rem; color: var(--gray); margin-top: 2px; margin-bottom: 8px; }
     .podio-item .bloque {
-      border-radius: 10px 10px 0 0; margin-top: 8px;
+      border-radius: 12px 12px 0 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; font-weight: 800; color: #fff;
+      font-size: .95rem; font-weight: 800;
     }
-    .pos1 .bloque { background: linear-gradient(135deg, var(--gold), #d4940a); color: #333; height: 80px; }
-    .pos2 .bloque { background: linear-gradient(135deg, var(--azul), var(--azul2)); height: 60px; }
-    .pos3 .bloque { background: linear-gradient(135deg, #cd7f32, #a0611f); height: 44px; }
+    .pos1 .bloque { background: linear-gradient(135deg, var(--gold), #d4940a); color: #333; height: 90px; }
+    .pos2 .bloque { background: linear-gradient(135deg, var(--azul), var(--azul2)); color: #fff; height: 68px; }
+    .pos3 .bloque { background: linear-gradient(135deg, #cd7f32, #a0611f); color: #fff; height: 50px; }
     .pos1 .pts { color: #c49a00; }
     .pos2 .pts { color: var(--azul2); }
     .pos3 .pts { color: #a0611f; }
@@ -65,36 +78,42 @@
       background: #fff; border-radius: 12px;
       box-shadow: 0 2px 14px rgba(45,111,160,.15); overflow: hidden;
     }
-    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    table { width: 100%; border-collapse: collapse; font-size: .95rem; }
     thead th {
       background: linear-gradient(180deg, var(--azul2), var(--azul3));
-      color: #fff; padding: 11px 14px; text-align: left; font-weight: 700;
+      color: #fff; padding: 13px 16px; text-align: left; font-weight: 700; font-size: .9rem;
     }
-    thead th:not(:first-child):not(:nth-child(2)) { text-align: center; }
-    thead th:nth-child(2) { text-align: left; }
+    thead th:not(:nth-child(2)) { text-align: center; }
     tbody tr:nth-child(even) td { background: #f0f7ff; }
-    tbody tr:hover td { background: #dbeeff !important; }
-    tbody td { padding: 11px 14px; border-bottom: 1px solid #dde8f5; }
-    tbody td:not(:first-child):not(:nth-child(2)) { text-align: center; }
+    tbody tr:hover td { background: #dbeeff !important; transition: background .15s; }
+    tbody td { padding: 13px 16px; border-bottom: 1px solid #dde8f5; vertical-align: middle; }
+    tbody td:not(:nth-child(2)) { text-align: center; }
 
-    .rank { font-weight: 900; color: var(--gray); font-size: .88rem; }
-    .rank-1 { color: #c49a00; font-size: 1.1rem; }
-    .rank-2 { color: var(--azul2); }
-    .rank-3 { color: #a0611f; }
-    .nombre-link { font-weight: 700; color: var(--azul3); text-decoration: none; }
+    .rank { font-weight: 900; color: var(--gray); font-size: .95rem; }
+    .nombre-link { font-weight: 700; color: var(--azul3); text-decoration: none; font-size: 1rem; }
     .nombre-link:hover { text-decoration: underline; }
-    .pts-col { font-weight: 900; font-size: 1.05rem; color: var(--azul3); }
-    .badge-exacto   { background: #d4edda; color: #155724; border-radius: 5px; padding: 2px 7px; font-weight: 700; font-size: .82rem; }
-    .badge-result   { background: #fff3cd; color: #856404; border-radius: 5px; padding: 2px 7px; font-weight: 700; font-size: .82rem; }
+    .pts-col { font-weight: 900; font-size: 1.2rem; color: var(--azul3); }
+    .badge { border-radius: 6px; padding: 3px 10px; font-weight: 800; font-size: .88rem; display: inline-block; }
+    .badge-exacto  { background: #d4edda; color: #155724; }
+    .badge-result  { background: #fff3cd; color: #856404; }
 
-    .empty { text-align: center; padding: 48px 20px; color: var(--gray); }
-    .info  { font-size: .8rem; color: var(--gray); text-align: center; margin-top: 16px; }
+    .empty { text-align: center; padding: 56px 20px; color: var(--gray); }
+    .info  { font-size: .82rem; color: var(--gray); text-align: center; margin-top: 18px; }
   </style>
 </head>
 <body>
 <div class="header">
-  <h1>🏆 Tabla de posiciones</h1>
-  <p>Prode GiPA Argentina Mundial 2026</p>
+  <div class="header-inner">
+    <div class="header-logo">
+      <img src="/static/Logo_gipa.png" alt="GiPA Argentina">
+    </div>
+    <div class="header-titulo">
+      <h1>🏆 Tabla de <span>posiciones</span></h1>
+      <p>Prode GiPA Argentina Mundial 2026</p>
+    </div>
+    <img class="header-messi" src="/static/messi.png" alt="Messi"
+         onerror="this.style.display='none'">
+  </div>
   <div class="header-links">
     <a href="/">🏠 Inicio</a>
     <a href="/todos">👥 Todos los pronósticos</a>
@@ -136,35 +155,35 @@
         <tr>
           <th>#</th>
           <th>Participante</th>
-          <th>Pts</th>
+          <th>Puntos</th>
           <th>Exactos</th>
-          <th>Result.</th>
+          <th>Resultados</th>
           <th>Jugados</th>
         </tr>
       </thead>
       <tbody>
         {% for row in tabla %}
         <tr>
-          <td><span class="rank rank-{{ loop.index if loop.index <= 3 else '' }}">
+          <td><span class="rank">
             {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
           </span></td>
           <td><a class="nombre-link" href="/mis-pronosticos/{{ row.nombre }}">{{ row.nombre }}</a></td>
           <td class="pts-col">{{ row.total }}</td>
-          <td><span class="badge-exacto">{{ row.exactos }}</span></td>
-          <td><span class="badge-result">{{ row.resultados }}</span></td>
-          <td style="color:var(--gray)">{{ row.jugados }}</td>
+          <td><span class="badge badge-exacto">{{ row.exactos }}</span></td>
+          <td><span class="badge badge-result">{{ row.resultados }}</span></td>
+          <td style="color:var(--gray);font-weight:600">{{ row.jugados }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-  <p class="info">🎯 Exacto = 3 pts &nbsp;·&nbsp; ✅ Resultado correcto = 1 pt</p>
+  <p class="info">🎯 Exacto (marcador exacto) = 3 pts &nbsp;·&nbsp; ✅ Resultado correcto (ganador/empate) = 1 pt</p>
 
   {% else %}
   <div class="empty">
     <p style="font-size:2.5rem">⏳</p>
-    <p style="font-size:1rem;margin-top:8px">Todavía no hay puntos calculados.</p>
-    <p style="margin-top:8px;font-size:.85rem;color:var(--gray)">La tabla aparece cuando el admin cargue los resultados reales.</p>
+    <p style="font-size:1rem;margin-top:10px">Todavía no hay puntos calculados.</p>
+    <p style="margin-top:8px;font-size:.85rem">La tabla aparece cuando el admin cargue los resultados reales.</p>
   </div>
   {% endif %}
 </div>
