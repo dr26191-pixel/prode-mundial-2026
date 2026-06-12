@@ -124,6 +124,26 @@
     .score-inputs input:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(74,144,217,.2); }
     .score-inputs .sep { font-size: 1.2rem; font-weight: 900; color: var(--gray); }
 
+    /* ── Partido terminado (bloqueado) ── */
+    .partido.terminado {
+      background: #f0f7ff;
+      border: 1.5px solid var(--azul);
+      opacity: .92;
+    }
+    .resultado-final {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+    }
+    .resultado-final .score {
+      font-size: 1.5rem; font-weight: 900; color: var(--azul3);
+      letter-spacing: .05em;
+    }
+    .resultado-final .sep { font-size: 1.2rem; font-weight: 900; color: var(--gray); }
+    .lock-badge {
+      font-size: .68rem; background: var(--azul3); color: #fff;
+      border-radius: 4px; padding: 2px 7px; font-weight: 700;
+      text-align: center; margin-bottom: 4px;
+    }
+
     /* ── Submit button ── */
     .btn-submit {
       margin-top: 28px; width: 100%; padding: 15px;
@@ -177,15 +197,25 @@
       {% if partidos_fase %}
     <p class="section-title">{{ fase }}</p>
     {% for p in partidos_fase %}
-    <div class="partido">
+    {% set terminado = p.goles_local is not none and p.goles_visit is not none %}
+    <div class="partido {{ 'terminado' if terminado else '' }}">
       <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
       <div>
-        <div class="fase-tag">{{ p.fase }}</div>
-        <div class="score-inputs">
-          <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-          <span class="sep">–</span>
-          <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-        </div>
+        {% if terminado %}
+          <div class="lock-badge">🔒 Terminado</div>
+          <div class="resultado-final">
+            <span class="score">{{ p.goles_local }}</span>
+            <span class="sep">–</span>
+            <span class="score">{{ p.goles_visit }}</span>
+          </div>
+        {% else %}
+          <div class="fase-tag">{{ p.fase }}</div>
+          <div class="score-inputs">
+            <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <span class="sep">–</span>
+            <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+          </div>
+        {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
       <div class="equipo visit">{{ p.equipo_visit }} {{ bandera_img(p.equipo_visit) | safe }}</div>
@@ -198,15 +228,25 @@
     {% for p in partidos %}
       {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
       {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
-    <div class="partido">
+    {% set terminado = p.goles_local is not none and p.goles_visit is not none %}
+    <div class="partido {{ 'terminado' if terminado else '' }}">
       <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
       <div>
-        <div class="fase-tag">{{ p.fase }}</div>
-        <div class="score-inputs">
-          <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-          <span class="sep">–</span>
-          <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-        </div>
+        {% if terminado %}
+          <div class="lock-badge">🔒 Terminado</div>
+          <div class="resultado-final">
+            <span class="score">{{ p.goles_local }}</span>
+            <span class="sep">–</span>
+            <span class="score">{{ p.goles_visit }}</span>
+          </div>
+        {% else %}
+          <div class="fase-tag">{{ p.fase }}</div>
+          <div class="score-inputs">
+            <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <span class="sep">–</span>
+            <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+          </div>
+        {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
       <div class="equipo visit">{{ p.equipo_visit }} {{ bandera_img(p.equipo_visit) | safe }}</div>

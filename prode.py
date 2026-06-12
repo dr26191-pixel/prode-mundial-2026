@@ -243,6 +243,10 @@ def pronostico():
         if not key.startswith("local_"):
             continue
         pid = int(key.split("_", 1)[1])
+        # No guardar pronóstico si el partido ya tiene resultado
+        partido = fetchone(db_execute(f"SELECT goles_local FROM partidos WHERE id={p}", (pid,)))
+        if partido and partido["goles_local"] is not None:
+            continue
         gl  = int(request.form.get(f"local_{pid}", 0) or 0)
         gv  = int(request.form.get(f"visit_{pid}", 0) or 0)
         ts  = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
