@@ -1,6 +1,8 @@
 import os
 import csv
 import io
+import json
+import urllib.request
 from datetime import datetime
 from flask import (Flask, render_template, request, redirect,
                    url_for, g, flash, session, send_file)
@@ -50,6 +52,30 @@ SIGLAS = {
 }
 app.jinja_env.globals["siglas"] = SIGLAS
 
+# Traduce nombres de football-data.org (inglés) → nombres usados en la DB (español)
+NOMBRES_API = {
+    "Mexico":"México", "South Africa":"Sudáfrica", "South Korea":"Corea del Sur",
+    "Czechia":"Rep. Checa", "Czech Republic":"Rep. Checa",
+    "Canada":"Canadá", "Bosnia and Herzegovina":"Bosnia",
+    "Switzerland":"Suiza", "Brazil":"Brasil", "Morocco":"Marruecos",
+    "Haiti":"Haití", "Scotland":"Escocia", "USA":"EE.UU.",
+    "United States":"EE.UU.", "Australia":"Australia", "Turkey":"Turquía",
+    "Germany":"Alemania", "Curaçao":"Curazao", "Curacao":"Curazao",
+    "Ivory Coast":"Costa de Marfil", "Côte d'Ivoire":"Costa de Marfil",
+    "Ecuador":"Ecuador", "Netherlands":"Países Bajos",
+    "Japan":"Japón", "Sweden":"Suecia", "Tunisia":"Túnez",
+    "Belgium":"Bélgica", "Egypt":"Egipto", "Iran":"Irán",
+    "New Zealand":"Nueva Zelanda", "Spain":"España", "Cape Verde":"Cabo Verde",
+    "Saudi Arabia":"Arabia Saudita", "Uruguay":"Uruguay", "France":"Francia",
+    "Senegal":"Senegal", "Iraq":"Irak", "Norway":"Noruega",
+    "Argentina":"Argentina", "Algeria":"Argelia", "Austria":"Austria",
+    "Jordan":"Jordania", "Portugal":"Portugal",
+    "DR Congo":"Rep. Dem. Congo", "Congo DR":"Rep. Dem. Congo",
+    "Uzbekistan":"Uzbekistán", "Colombia":"Colombia",
+    "England":"Inglaterra", "Croatia":"Croacia", "Ghana":"Ghana",
+    "Panama":"Panamá", "Paraguay":"Paraguay", "Qatar":"Qatar",
+}
+
 def bandera_img(nombre, size=24):
     code = FLAG_CODES.get(nombre)
     if not code:
@@ -61,8 +87,9 @@ def bandera_img(nombre, size=24):
 app.jinja_env.globals["bandera_img"] = bandera_img
 app.jinja_env.globals["banderas"]    = FLAG_CODES  # por si algún template usa banderas.get()
 
-ADMIN_PASSWORD  = os.environ.get("ADMIN_PASSWORD", "gipa2026")
-DATABASE_URL    = os.environ.get("DATABASE_URL")   # Render lo setea automáticamente
+ADMIN_PASSWORD      = os.environ.get("ADMIN_PASSWORD", "gipa2026")
+DATABASE_URL        = os.environ.get("DATABASE_URL")        # Render lo setea automáticamente
+FOOTBALL_DATA_KEY   = os.environ.get("FOOTBALL_DATA_KEY", "")
 
 # SQLite (local)
 DB = os.path.join(os.path.dirname(__file__), "prode.db")
@@ -302,7 +329,9 @@ def admin():
     if not session.get("admin"):
         return render_template("admin_login.html")
     partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
-    return render_template("admin.html", partidos=partidos)
+    participantes = [r["nombre"] for r in fetchall(db_execute(
+        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
+    return render_template("admin.html", partidos=partidos, participantes=participantes)
 
 @app.route("/admin/partido", methods=["POST"])
 def admin_partido():
@@ -426,6 +455,68 @@ def sync_sheets():
         flash("✅ Sincronizado con Google Sheets correctamente.")
     except Exception as e:
         flash(f"Error al sincronizar: {e}")
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/sync-resultados")
+def sync_resultados():
+    if not session.get("admin"): return redirect(url_for("admin"))
+    if not FOOTBALL_DATA_KEY:
+        flash("Configurá la variable FOOTBALL_DATA_KEY en Render para usar esta función.")
+        return redirect(url_for("admin"))
+    try:
+        req = urllib.request.Request(
+            "https://api.football-data.org/v4/competitions/WC/matches?status=FINISHED",
+            headers={"X-Auth-Token": FOOTBALL_DATA_KEY}
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read())
+
+        p = placeholder()
+        actualizados = 0
+        for m in data.get("matches", []):
+            score = m.get("score", {})
+            if score.get("winner") is None:
+                continue
+            ft = score.get("fullTime", {})
+            gl = ft.get("home")
+            gv = ft.get("away")
+            if gl is None or gv is None:
+                continue
+            home_es = NOMBRES_API.get(m.get("homeTeam", {}).get("name", ""), "")
+            away_es = NOMBRES_API.get(m.get("awayTeam", {}).get("name", ""), "")
+            if not home_es or not away_es:
+                continue
+            partido = fetchone(db_execute(
+                f"SELECT * FROM partidos WHERE equipo_local={p} AND equipo_visit={p}",
+                (home_es, away_es)))
+            if not partido:
+                continue
+            if partido["goles_local"] == gl and partido["goles_visit"] == gv:
+                continue
+            db_execute(
+                f"UPDATE partidos SET goles_local={p}, goles_visit={p} WHERE id={p}",
+                (gl, gv, partido["id"]))
+            for pron in fetchall(db_execute(
+                    f"SELECT * FROM pronosticos WHERE partido_id={p}", (partido["id"],))):
+                pts = calcular_puntos(pron["goles_local"], pron["goles_visit"], gl, gv)
+                db_execute(f"UPDATE pronosticos SET puntos={p} WHERE id={p}", (pts, pron["id"]))
+            actualizados += 1
+
+        db_commit()
+        flash(f"Sincronizado: {actualizados} partido(s) actualizado(s).")
+    except Exception as e:
+        flash(f"Error al sincronizar: {e}")
+    return redirect(url_for("admin"))
+
+
+@app.route("/admin/borrar-usuario/<nombre>", methods=["POST"])
+def borrar_usuario(nombre):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    p = placeholder()
+    db_execute(f"DELETE FROM pronosticos WHERE nombre={p}", (nombre,))
+    db_commit()
+    flash(f"Usuario '{nombre}' eliminado correctamente.")
     return redirect(url_for("admin"))
 
 

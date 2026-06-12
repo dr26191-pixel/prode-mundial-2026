@@ -156,6 +156,39 @@
     {% endif %}
   </div>
 
+  <!-- ── Sincronizar resultados ── -->
+  <div class="section">
+    <h2>🔄 Resultados automáticos</h2>
+    <p style="font-size:.85rem;color:var(--gray);margin-bottom:14px;">
+      Trae los resultados finales desde football-data.org y recalcula los puntos de todos los participantes.
+      Requiere la variable <code>FOOTBALL_DATA_KEY</code> en Render.
+    </p>
+    <a href="/admin/sync-resultados" class="btn btn-green">🔄 Sincronizar resultados reales</a>
+  </div>
+
+  <!-- ── Participantes ── -->
+  <div class="section">
+    <h2>👥 Participantes</h2>
+    {% if participantes %}
+      {% for nombre in participantes %}
+      <div class="partido-row" style="padding:10px 14px;">
+        <div class="partido-info" style="min-width:0">
+          <div class="teams">{{ nombre }}</div>
+        </div>
+        <div class="partido-acciones">
+          <a href="/mis-pronosticos/{{ nombre }}" class="btn btn-gray btn-sm">Ver pronósticos</a>
+          <form action="/admin/borrar-usuario/{{ nombre }}" method="POST"
+                onsubmit="return confirm('¿Borrar todos los pronósticos de {{ nombre }}?')">
+            <button class="btn btn-red btn-sm" type="submit">🗑 Borrar</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="no-data">No hay participantes todavía.</p>
+    {% endif %}
+  </div>
+
   <!-- ── Exportar ── -->
   <div class="section">
     <h2>📤 Exportar datos</h2>
