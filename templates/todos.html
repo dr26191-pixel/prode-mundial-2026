@@ -6,63 +6,66 @@
   <title>Todos los pronósticos – Prode Mundial 2026</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --green:#1a5c2e; --green2:#27ae60; --gold:#f0c040; --gray:#5a5a5a; --light:#f4f7f4; }
+    :root {
+      --azul:#74ACDF; --azul2:#4A90D9; --azul3:#2D6FA0;
+      --gold:#F6B40E; --gray:#5a5a5a; --light:#EEF5FC;
+    }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
 
-    .header { background: linear-gradient(135deg,var(--green),#0e3a1c); color:#fff;
-              padding:20px; text-align:center; }
-    .header h1 { font-size:1.3rem; font-weight:800; }
-    .header p  { font-size:.82rem; opacity:.75; margin-top:3px; }
-    .header-links { margin-top:12px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-    .header-links a { background:rgba(255,255,255,.15); color:#fff; text-decoration:none;
-      padding:7px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
-      border:1px solid rgba(255,255,255,.25); }
+    /* ── Header ── */
+    .header { background: linear-gradient(180deg,var(--azul) 0%,#fff 50%,var(--azul) 100%);
+              border-bottom:3px solid var(--azul2); padding:16px 20px 0; text-align:center; }
+    .header h1 { font-size:1.25rem; font-weight:900; color:var(--azul3); }
+    .header p  { font-size:.82rem; color:var(--azul3); opacity:.8; margin-top:2px; margin-bottom:12px; }
+    .header-links { background:var(--azul2); margin:0 -20px; padding:8px 20px;
+                    display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    .header-links a { background:rgba(255,255,255,.18); color:#fff; text-decoration:none;
+      padding:6px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
+      border:1px solid rgba(255,255,255,.3); }
 
     /* ── Filtros ── */
-    .filtros { display:flex; gap:8px; flex-wrap:wrap; padding:16px 16px 8px; }
-    .filtro-btn { background:#fff; border:1.5px solid #d0d0d0; border-radius:20px;
-                  padding:6px 16px; font-size:.82rem; font-weight:600; cursor:pointer;
-                  color:var(--gray); }
-    .filtro-btn.active { background:var(--green); color:#fff; border-color:var(--green); }
+    .filtros { display:flex; gap:8px; flex-wrap:wrap; padding:14px 16px 6px; align-items:center; }
+    .filtro-btn { background:#fff; border:1.5px solid var(--azul); border-radius:20px;
+                  padding:5px 14px; font-size:.82rem; font-weight:600; cursor:pointer; color:var(--azul3); }
+    .filtro-btn.active { background:var(--azul2); color:#fff; border-color:var(--azul2); }
 
     /* ── Tabla ── */
-    .wrap { overflow-x:auto; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); }
+    .wrap { overflow-x:auto; border-radius:12px; box-shadow:0 2px 14px rgba(45,111,160,.15);
+            margin:0 16px 32px; }
     table { border-collapse:collapse; width:100%; background:#fff; font-size:.85rem; }
 
     /* cabecera */
     thead th {
-      background:var(--green); color:#fff;
-      padding:8px 6px; text-align:center;
-      position:sticky; top:0; z-index:2;
-      white-space:nowrap;
+      background: linear-gradient(180deg, var(--azul2), var(--azul3));
+      color:#fff; padding:9px 7px; text-align:center;
+      position:sticky; top:0; z-index:2; white-space:nowrap;
     }
     thead th.th-nombre {
-      text-align:left; min-width:110px; padding-left:14px;
-      position:sticky; left:0; z-index:3; background:var(--green);
+      text-align:left; min-width:120px; padding-left:14px;
+      position:sticky; left:0; z-index:3;
+      background: linear-gradient(180deg, var(--azul2), var(--azul3));
     }
-    thead th.th-partido { min-width:80px; max-width:100px; font-size:.72rem; line-height:1.4; }
+    thead th.th-partido { min-width:82px; max-width:100px; font-size:.72rem; line-height:1.5; }
 
-    /* resultado real en cabecera */
     .th-resultado { color:var(--gold); font-size:.8rem; font-weight:900; }
     .th-flags { font-size:.75rem; font-weight:700; white-space:nowrap; }
-    .th-fecha { font-size:.62rem; opacity:.7; }
+    .th-fecha { font-size:.62rem; opacity:.75; }
 
     /* filas */
-    tbody tr:nth-child(even) td { background:#f9fdf9; }
-    tbody tr:hover td { background:#edf7ee; }
+    tbody tr:nth-child(even) td { background:#f0f7ff; }
+    tbody tr:hover td { background:#dbeeff !important; }
     tbody td {
-      padding:8px 6px; border-bottom:1px solid #ebebeb;
+      padding:8px 7px; border-bottom:1px solid #dde8f5;
       text-align:center; vertical-align:middle;
     }
     tbody td.td-nombre {
       text-align:left; font-weight:700; padding-left:14px;
-      position:sticky; left:0; z-index:1;
-      background:inherit;
-      border-right:2px solid #d0e8d0;
+      position:sticky; left:0; z-index:1; background:inherit;
+      border-right:2px solid var(--azul);
     }
-    tbody tr:nth-child(even) td.td-nombre { background:#f9fdf9; }
-    tbody tr:hover td.td-nombre { background:#edf7ee; }
-    tbody td.td-nombre a { color:var(--green); text-decoration:none; }
+    tbody tr:nth-child(even) td.td-nombre { background:#f0f7ff; }
+    tbody tr:hover td.td-nombre { background:#dbeeff !important; }
+    tbody td.td-nombre a { color:var(--azul3); text-decoration:none; font-weight:800; }
     tbody td.td-nombre a:hover { text-decoration:underline; }
 
     /* chips de predicción */
@@ -74,15 +77,15 @@
     .chip.p3  { background:#d4edda; color:#155724; }
     .chip.p1  { background:#fff3cd; color:#856404; }
     .chip.p0  { background:#f8d7da; color:#721c24; }
-    .chip.pnd { background:#f0f0f0; color:#888; font-weight:600; }
+    .chip.pnd { background:#e8f0fb; color:#4a7ab5; font-weight:600; }
     .chip-pts { font-size:.6rem; font-weight:900; margin-top:1px; }
 
-    .no-pred { color:#ccc; font-size:.75rem; }
+    .no-pred { color:#c0cfe8; font-size:.75rem; }
 
     .empty { text-align:center; padding:48px 20px; color:var(--gray); }
-    .leyenda { display:flex; gap:10px; flex-wrap:wrap; padding:10px 16px 4px;
-               font-size:.75rem; align-items:center; }
-    .leyenda span { display:inline-flex; align-items:center; gap:4px; }
+    .leyenda { display:flex; gap:12px; flex-wrap:wrap; padding:4px 16px 10px;
+               font-size:.75rem; align-items:center; color:var(--gray); }
+    .leyenda span { display:inline-flex; align-items:center; gap:5px; }
   </style>
 </head>
 <body>
@@ -93,6 +96,7 @@
   <div class="header-links">
     <a href="/">🏠 Inicio</a>
     <a href="/tabla">🏆 Tabla</a>
+    <a href="/admin">⚙️ Admin</a>
   </div>
 </div>
 

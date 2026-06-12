@@ -76,12 +76,16 @@
     }
     .nombre-card input:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(74,144,217,.2); }
 
-    /* ── Section title ── */
+    /* ── Section title – sticky banner ── */
     .section-title {
-      font-size: 0.72rem; font-weight: 700; letter-spacing: .09em;
-      text-transform: uppercase; color: var(--azul3);
-      margin: 28px 0 14px; padding-bottom: 6px;
-      border-bottom: 2px solid var(--azul);
+      font-size: .78rem; font-weight: 800; letter-spacing: .1em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--azul2), var(--azul3));
+      color: #fff;
+      padding: 8px 16px;
+      margin: 16px -16px 12px;
+      position: sticky; top: 0; z-index: 10;
+      box-shadow: 0 2px 8px rgba(45,111,160,.25);
     }
 
     /* ── Partido card ── */
