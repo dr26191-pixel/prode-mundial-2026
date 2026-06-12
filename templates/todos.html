@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todos los pronósticos – Prode Mundial 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green:#1a5c2e; --green2:#27ae60; --gold:#f0c040; --gray:#5a5a5a; --light:#f4f7f4; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
+    .header { background: linear-gradient(135deg,var(--green),#0e3a1c); color:#fff;
+              padding:20px; text-align:center; }
+    .header h1 { font-size:1.3rem; font-weight:800; }
+    .header p  { font-size:.82rem; opacity:.75; margin-top:3px; }
+    .header-links { margin-top:12px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    .header-links a { background:rgba(255,255,255,.15); color:#fff; text-decoration:none;
+      padding:7px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
+      border:1px solid rgba(255,255,255,.25); }
+    .container { max-width:900px; margin:0 auto; padding:24px 16px 60px; }
+
+    /* ── Tabla grande ── */
+    .tabla-wrap { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08);
+                  overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.84rem; white-space:nowrap; }
+    thead th { background:var(--green); color:#fff; padding:10px 14px; font-weight:700;
+               text-align:center; position:sticky; top:0; }
+    thead th.partido-th { min-width:100px; font-size:.75rem; }
+    thead th.nombre-th { text-align:left; min-width:120px; position:sticky; left:0;
+                         z-index:2; background:var(--green); }
+    tbody tr:nth-child(even) { background:#f9fdf9; }
+    tbody td { padding:9px 12px; border-bottom:1px solid #e8e8e8; text-align:center; }
+    tbody td.nombre-td { text-align:left; font-weight:700; position:sticky; left:0;
+                         background:inherit; z-index:1; }
+    tbody td.nombre-td a { color:var(--green); text-decoration:none; }
+    tbody td.nombre-td a:hover { text-decoration:underline; }
+
+    .pred { font-weight:700; }
+    .p3 { background:#d4edda; color:#155724; border-radius:4px; padding:1px 6px; }
+    .p1 { background:#fff3cd; color:#856404; border-radius:4px; padding:1px 6px; }
+    .p0 { background:#f8d7da; color:#721c24; border-radius:4px; padding:1px 6px; }
+    .pnd { color:#aaa; font-size:.8rem; }
+    .no-pred { color:#ccc; font-size:.8rem; }
+
+    .empty { text-align:center; padding:48px 20px; color:var(--gray); }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>👥 Todos los pronósticos</h1>
+  <p>Prode Mundial 2026</p>
+  <div class="header-links">
+    <a href="/">🏠 Inicio</a>
+    <a href="/tabla">🏆 Tabla</a>
+  </div>
+</div>
+
+<div class="container">
+  {% if partidos and nombres %}
+  <div class="tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="nombre-th">Participante</th>
+          {% for p in partidos %}
+          <th class="partido-th">
+            {{ p.equipo_local | truncate(8, True, '') }}<br>vs<br>{{ p.equipo_visit | truncate(8, True, '') }}
+            {% if p.goles_local is not none and p.goles_visit is not none %}
+            <br><span style="color:var(--gold);font-weight:900">{{ p.goles_local }}–{{ p.goles_visit }}</span>
+            {% endif %}
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for nombre in nombres %}
+        <tr>
+          <td class="nombre-td"><a href="/mis-pronosticos/{{ nombre }}">{{ nombre }}</a></td>
+          {% for p in partidos %}
+            {% if p.id in pronosticos[nombre] %}
+              {% set pr = pronosticos[nombre][p.id] %}
+              <td>
+                {% if pr.puntos is not none %}
+                  <span class="pred {{ 'p3' if pr.puntos==3 else ('p1' if pr.puntos==1 else 'p0') }}">
+                    {{ pr.goles_local }}–{{ pr.goles_visit }}
+                  </span>
+                {% else %}
+                  <span class="pred pnd">{{ pr.goles_local }}–{{ pr.goles_visit }}</span>
+                {% endif %}
+              </td>
+            {% else %}
+              <td class="no-pred">–</td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <p style="font-size:2rem">📋</p>
+    <p>Todavía no hay pronósticos cargados.</p>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>

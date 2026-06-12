@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta de Satisfacción – GiPA Plenaria</title>
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── Paleta GiPA ── */
+    :root {
+      --orange: #F59B23;
+      --orange-dark: #D4820E;
+      --orange-light: #FEF3E0;
+      --gray-900: #3A3A3A;
+      --gray-700: #5A5A5A;
+      --gray-500: #8A8A8A;
+      --gray-200: #E8E8E8;
+      --gray-100: #F5F5F5;
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-900);
+      padding: 0 0 48px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      max-width: 720px;
+      margin: 0 auto;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.10);
+    }
+
+    @media (min-width: 600px) {
+      body {
+        padding: 24px 16px 64px;
+      }
+
+      .card {
+        border-radius: 14px;
+        overflow: hidden;
+      }
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--gray-900);
+      padding: 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 24px 16px;
+      border-bottom: 3px solid var(--orange);
+    }
+
+    .header-logo {
+      flex-shrink: 0;
+      width: 68px;
+      height: 68px;
+      background: var(--white);
+      border-radius: 10px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .header-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+    }
+
+    .header-text h1 span {
+      color: var(--orange);
+    }
+
+    .header-text p {
+      font-size: 0.83rem;
+      color: var(--gray-200);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    @media (min-width: 600px) {
+      .header-top {
+        padding: 24px 36px 20px;
+        gap: 22px;
+      }
+
+      .header-logo {
+        width: 82px;
+        height: 82px;
+        padding: 8px;
+        border-radius: 12px;
+      }
+
+      .header-text h1 {
+        font-size: 1.4rem;
+      }
+
+      .header-text p {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* ── Orange accent bar ── */
+    .header-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--orange) 0%, var(--orange-dark) 100%);
+    }
+
+    /* ── Form layout ── */
+    form {
+      padding: 24px 16px;
+    }
+
+    @media (min-width: 600px) {
+      form {
+        padding: 32px 36px;
+      }
+    }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--orange-dark);
+      margin: 32px 0 16px;
+      padding-bottom: 7px;
+      border-bottom: 2px solid var(--orange-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      background: var(--orange);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .section-title:first-child {
+      margin-top: 0;
+    }
+
+    /* ── Generic field ── */
+    .field {
+      margin-bottom: 20px;
+    }
+
+    .field>label {
+      display: block;
+      font-size: 0.93rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      color: var(--gray-700);
+    }
+
+    .req {
+      color: var(--orange);
+      margin-left: 2px;
+    }
+
+    /* ── Text inputs / textareas ── */
+    input[type=text],
+    input[type=number],
+    textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+      color: var(--gray-900);
+      background: var(--white);
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+
+    input[type=text]:focus,
+    input[type=number]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px var(--orange-light);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    /* ── Radio pill groups ── */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .radio-group label {
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gray-100);
+      border: 1.5px solid var(--gray-200);
+      border-radius: 9px;
+      padding: 13px 16px;
+      cursor: pointer;
+      transition: all .15s;
+      min-height: 48px;
+      line-height: 1.3;
+      color: var(--gray-700);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .radio-group input[type=radio] {
+      accent-color: var(--orange);
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .radio-group label:has(input:checked) {
+      background: var(--orange-light);
+      border-color: var(--orange);
+      color: var(--gray-900);
+      font-weight: 600;
+    }
+
+    @media (min-width: 480px) {
+      .radio-group.wrap {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .radio-group.wrap label {
+        min-width: 0;
+        flex: 0 0 auto;
+      }
+    }
+
+    /* ── 1–10 scale cards ── */
+    .scale-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .scale-item {
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 14px 14px 12px;
+      background: var(--gray-100);
+    }
+
+    .scale-item-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .scale-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .scale-btns input[type=radio] {
+      display: none;
+    }
+
+    .scale-btns label {
+      flex: 1;
+      text-align: center;
+      padding: 10px 2px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--gray-500);
+      background: var(--white);
+      transition: all .15s;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scale-btns input:checked+label {
+      background: var(--orange);
+      border-color: var(--orange-dark);
+      color: var(--white);
+      box-shadow: 0 2px 6px rgba(245, 155, 35, 0.40);
+    }
+
+    .scale-btns label:active {
+      transform: scale(0.90);
+    }
+
+    .scale-legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      margin-top: 10px;
+      color: var(--gray-500);
+    }
+
+    .scale-legend .bad {
+      color: #C0392B;
+    }
+
+    .scale-legend .good {
+      color: #27AE60;
+    }
+
+    /* ── Satisfaction emoji scale ── */
+    .satis-group {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .satis-group input[type=radio] {
+      display: none;
+    }
+
+    .satis-group label {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid var(--gray-200);
+      border-radius: 10px;
+      padding: 12px 4px 10px;
+      transition: all .15s;
+      font-size: 0.72rem;
+      color: var(--gray-500);
+      font-weight: 500;
+      line-height: 1.3;
+      background: var(--gray-100);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .satis-group label .emoji {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .satis-group input:checked+label {
+      border-color: var(--orange);
+      background: var(--orange-light);
+      color: var(--gray-900);
+      font-weight: 700;
+    }
+
+    .satis-group label:active {
+      transform: scale(0.91);
+    }
+
+    /* ── Slide inputs ── */
+    .slide-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slide-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slide-entry span {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--orange-dark);
+      min-width: 24px;
+    }
+
+    .slide-entry input {
+      flex: 1;
+      max-width: 180px;
+    }
+
+    @media (min-width: 480px) {
+      .slide-row {
+        flex-direction: row;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .slide-entry input {
+        max-width: 130px;
+      }
+    }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      margin-top: 36px;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--orange-dark), var(--orange));
+      color: var(--white);
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: .04em;
+      transition: opacity .2s, transform .1s;
+      min-height: 54px;
+      box-shadow: 0 4px 14px rgba(245, 155, 35, 0.35);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-submit:active {
+      opacity: 0.85;
+      transform: scale(0.98);
+    }
+
+    @media (hover: hover) {
+      .btn-submit:hover {
+        opacity: 0.90;
+      }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 18px 16px 6px;
+      font-size: 0.78rem;
+      color: var(--gray-500);
+      border-top: 1px solid var(--gray-200);
+      margin-top: 8px;
+    }
+
+    /* ── Errores de validación ── */
+    .error-banner {
+      display: none;
+      background: #FEE2E2;
+      border: 1.5px solid #F87171;
+      border-radius: 9px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      color: #991B1B;
+      font-weight: 600;
+    }
+
+    .error-banner.visible {
+      display: block;
+    }
+
+    .campo-error .scale-item {
+      border-color: #F87171;
+      background: #FFF5F5;
+    }
+
+    .campo-error>label {
+      color: #991B1B;
+    }
+
+    .campo-error input[type=text] {
+      border-color: #F87171;
+    }
+
+    .campo-error .radio-group label {
+      border-color: #FECACA;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+
+    <!-- ── Header con logo ── -->
+    <div class="header">
+      <div class="header-top">
+        <div class="header-logo">
+          <img src="Logo_gipa.png" alt="Logo GiPA">
+        </div>
+        <div class="header-text">
+          <h1>Encuesta de Satisfacción<br><span>Plenaria GiPA</span></h1>
+          <p>Sus respuestas son anónimas y nos ayudan a mejorar. Gracias por su tiempo.</p>
+        </div>
+      </div>
+      <div class="header-bar"></div>
+    </div>
+
+    <form name="encuesta" method="POST" action="/" data-netlify="true" data-netlify-honeypot="bot-field" novalidate>
+      <input type="hidden" name="form-name" value="encuesta">
+      <p style="display:none"><label>No llenar: <input name="bot-field"></label></p>
+
+
+      <!-- ── 1. Datos personales ── -->
+      <p class="section-title">Datos personales</p>
+
+      <div class="field">
+        <label>Nombre del asistente <span class="req">*</span></label>
+        <input type="text" name="nombre" placeholder="Ej. Ana García" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Empresa <span class="req">*</span></label>
+        <input type="text" name="empresa" placeholder="Nombre de su empresa" autocomplete="organization">
+      </div>
+      <div class="field">
+        <label>Posición / Cargo <span class="req">*</span></label>
+        <input type="text" name="cargo" placeholder="Ej. Gerente Comercial" autocomplete="organization-title">
+      </div>
+
+      <div class="field">
+        <label>Sector <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="sector" value="Automotriz"> Automotriz</label>
+          <label><input type="radio" name="sector" value="Autopartista"> Autopartista</label>
+          <label><input type="radio" name="sector" value="Lubricantes / Petroleras"> Lubricantes / Petroleras</label>
+          <label><input type="radio" name="sector" value="Neumáticos"> Neumáticos</label>
+          <label><input type="radio" name="sector" value="Autocentro / Servicio Rápido"> Autocentro / Servicio
+            Rápido</label>
+          <label><input type="radio" name="sector" value="Grupo de distribución / Grupo de compra"> Grupo de
+            distribución / Grupo de compra</label>
+          <label><input type="radio" name="sector" value="Otro"> Otro</label>
+        </div>
+      </div>
+
+      <!-- ── 2. Primera vez ── -->
+      <p class="section-title">Asistencia a plenarias GiPA</p>
+
+      <div class="field">
+        <label>¿Es la primera vez que asiste a una plenaria de GiPA? <span class="req">*</span></label>
+        <div class="radio-group wrap">
+          <label><input type="radio" name="primera_vez" value="Sí"> Sí</label>
+          <label><input type="radio" name="primera_vez" value="No"> No</label>
+        </div>
+      </div>
+
+      <!-- ── 3. Evaluación 1–10 ── -->
+      <p class="section-title">Evaluación de la plenaria</p>
+      <p style="font-size:0.82rem;color:var(--gray-500);margin-bottom:16px;">Toque el número que mejor describe su
+        opinión (1 = malo · 10 = muy bueno).</p>
+
+      <div class="scale-items">
+
+        <div class="scale-item">
+          <div class="scale-item-label">Utilidad de las informaciones para mi trabajo</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_utilidad" id="eu1" value="1"><label for="eu1">1</label>
+            <input type="radio" name="eval_utilidad" id="eu2" value="2"><label for="eu2">2</label>
+            <input type="radio" name="eval_utilidad" id="eu3" value="3"><label for="eu3">3</label>
+            <input type="radio" name="eval_utilidad" id="eu4" value="4"><label for="eu4">4</label>
+            <input type="radio" name="eval_utilidad" id="eu5" value="5"><label for="eu5">5</label>
+            <input type="radio" name="eval_utilidad" id="eu6" value="6"><label for="eu6">6</label>
+            <input type="radio" name="eval_utilidad" id="eu7" value="7"><label for="eu7">7</label>
+            <input type="radio" name="eval_utilidad" id="eu8" value="8"><label for="eu8">8</label>
+            <input type="radio" name="eval_utilidad" id="eu9" value="9"><label for="eu9">9</label>
+            <input type="radio" name="eval_utilidad" id="eu10" value="10"><label for="eu10">10</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-item-label">Interés de la plenaria</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_interes" id="ei1" value="1"><label for="ei1">1</label>
+            <input type="radio" name="eval_interes" id="ei2" value="2"><label for="ei2">2</label>
+            <input type="radio" name="eval_interes" id="ei3" value="3"><label for="ei3">3</label>
+            <input type="radio" name="eval_interes" id="ei4" value="4"><label for="ei4">4</label>
+            <input type="radio" name="eval_interes" id="ei5" value="5"><label for="ei5">5</label>
+            <input type="radio" name="eval_interes" id="ei6" value="6"><label for="ei6">6</label>
+            <input type="radio" name="eval_interes" id="ei7" value="7"><label for="ei7">7</label>
+            <input type="radio" name="eval_interes" id="ei8" value="8"><label for="ei8">8</label>
+            <input type="radio" name="eval_interes" id="ei9" value="9"><label for="ei9">9</label>
+            <input type="radio" name="eval_interes" id="ei10" value="10"><label for="ei10">10</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-item-label">Calidad de los análisis e informaciones</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_calidad_analisis" id="ec1" value="1"><label for="ec1">1</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec2" value="2"><label for="ec2">2</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec3" value="3"><label for="ec3">3</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec4" value="4"><label for="ec4">4</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec5" value="5"><label for="ec5">5</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec6" value="6"><label for="ec6">6</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec7" value="7"><label for="ec7">7</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec8" value="8"><label for="ec8">8</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec9" value="9"><label for="ec9">9</label>
+            <input type="radio" name="eval_calidad_analisis" id="ec10" value="10"><label for="ec10">10</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-item-label">Preparación y habilidades del orador</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_orador" id="eo1" value="1"><label for="eo1">1</label>
+            <input type="radio" name="eval_orador" id="eo2" value="2"><label for="eo2">2</label>
+            <input type="radio" name="eval_orador" id="eo3" value="3"><label for="eo3">3</label>
+            <input type="radio" name="eval_orador" id="eo4" value="4"><label for="eo4">4</label>
+            <input type="radio" name="eval_orador" id="eo5" value="5"><label for="eo5">5</label>
+            <input type="radio" name="eval_orador" id="eo6" value="6"><label for="eo6">6</label>
+            <input type="radio" name="eval_orador" id="eo7" value="7"><label for="eo7">7</label>
+            <input type="radio" name="eval_orador" id="eo8" value="8"><label for="eo8">8</label>
+            <input type="radio" name="eval_orador" id="eo9" value="9"><label for="eo9">9</label>
+            <input type="radio" name="eval_orador" id="eo10" value="10"><label for="eo10">10</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-item-label">Calidad y características de las diapositivas</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_diapositivas" id="ed1" value="1"><label for="ed1">1</label>
+            <input type="radio" name="eval_diapositivas" id="ed2" value="2"><label for="ed2">2</label>
+            <input type="radio" name="eval_diapositivas" id="ed3" value="3"><label for="ed3">3</label>
+            <input type="radio" name="eval_diapositivas" id="ed4" value="4"><label for="ed4">4</label>
+            <input type="radio" name="eval_diapositivas" id="ed5" value="5"><label for="ed5">5</label>
+            <input type="radio" name="eval_diapositivas" id="ed6" value="6"><label for="ed6">6</label>
+            <input type="radio" name="eval_diapositivas" id="ed7" value="7"><label for="ed7">7</label>
+            <input type="radio" name="eval_diapositivas" id="ed8" value="8"><label for="ed8">8</label>
+            <input type="radio" name="eval_diapositivas" id="ed9" value="9"><label for="ed9">9</label>
+            <input type="radio" name="eval_diapositivas" id="ed10" value="10"><label for="ed10">10</label>
+          </div>
+        </div>
+
+        <div class="scale-item">
+          <div class="scale-item-label">Material entregado en su asistencia</div>
+          <div class="scale-btns">
+            <input type="radio" name="eval_material" id="em1" value="1"><label for="em1">1</label>
+            <input type="radio" name="eval_material" id="em2" value="2"><label for="em2">2</label>
+            <input type="radio" name="eval_material" id="em3" value="3"><label for="em3">3</label>
+            <input type="radio" name="eval_material" id="em4" value="4"><label for="em4">4</label>
+            <input type="radio" name="eval_material" id="em5" value="5"><label for="em5">5</label>
+            <input type="radio" name="eval_material" id="em6" value="6"><label for="em6">6</label>
+            <input type="radio" name="eval_material" id="em7" value="7"><label for="em7">7</label>
+            <input type="radio" name="eval_material" id="em8" value="8"><label for="em8">8</label>
+            <input type="radio" name="eval_material" id="em9" value="9"><label for="em9">9</label>
+            <input type="radio" name="eval_material" id="em10" value="10"><label for="em10">10</label>
+          </div>
+        </div>
+
+      </div>
+      <div class="scale-legend">
+        <span class="bad">1 = Malo / no satisfecho</span>
+        <span class="good">10 = Muy bueno / completamente satisfecho</span>
+      </div>
+
+      <!-- ── 4. Duración y utilidad ── -->
+      <p class="section-title">Duración y utilidad</p>
+
+      <div class="field">
+        <label>La duración de la plenaria para usted fue <span class="req">*</span></label>
+        <div class="radio-group wrap">
+          <label><input type="radio" name="duracion" value="Demasiado larga"> Demasiado larga</label>
+          <label><input type="radio" name="duracion" value="Adecuada"> Adecuada</label>
+          <label><input type="radio" name="duracion" value="Demasiado corta"> Demasiado corta</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Qué tan útil fue para usted venir a la plenaria? <span class="req">*</span></label>
+        <div class="radio-group wrap">
+          <label><input type="radio" name="utilidad_visita" value="Nada útil"> Nada útil</label>
+          <label><input type="radio" name="utilidad_visita" value="Poco útil"> Poco útil</label>
+          <label><input type="radio" name="utilidad_visita" value="Útil"> Útil</label>
+          <label><input type="radio" name="utilidad_visita" value="Muy útil"> Muy útil</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Por qué?</label>
+        <textarea name="porque_utilidad" placeholder="Cuéntenos el motivo…"></textarea>
+      </div>
+
+      <!-- ── 5. Satisfacción general ── -->
+      <p class="section-title">Satisfacción general</p>
+
+      <div class="field">
+        <label>¿Cómo es su satisfacción general con esta plenaria? <span class="req">*</span></label>
+        <div class="satis-group">
+          <input type="radio" name="satisfaccion_general" id="sg1" value="1 - Nada satisfecho">
+          <label for="sg1"><span class="emoji">😞</span>Nada<br>satisfecho</label>
+
+          <input type="radio" name="satisfaccion_general" id="sg2" value="2 - Poco satisfecho">
+          <label for="sg2"><span class="emoji">😕</span>Poco<br>satisfecho</label>
+
+          <input type="radio" name="satisfaccion_general" id="sg3" value="3 - Neutral">
+          <label for="sg3"><span class="emoji">😐</span>Neutral</label>
+
+          <input type="radio" name="satisfaccion_general" id="sg4" value="4 - Satisfecho">
+          <label for="sg4"><span class="emoji">😊</span>Satisfecho</label>
+
+          <input type="radio" name="satisfaccion_general" id="sg5" value="5 - Muy satisfecho">
+          <label for="sg5"><span class="emoji">😄</span>Muy<br>satisfecho</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>En caso de encontrarse insatisfecho, ¿por qué razón?</label>
+        <textarea name="razon_insatisfaccion" placeholder="Opcional…"></textarea>
+      </div>
+
+      <!-- ── 6. Slides de interés ── -->
+      <p class="section-title">Slides de especial interés</p>
+
+      <div class="field">
+        <label>¿Cuáles slides le parecieron de especial interés?<br>
+          <span style="font-weight:400;font-size:0.85rem;color:var(--gray-500);">Escriba el número de diapositiva por
+            orden de interés</span>
+        </label>
+        <div class="slide-row">
+          <div class="slide-entry">
+            <span>1°</span>
+            <input type="text" name="slide1" placeholder="Nº diapositiva" inputmode="numeric">
+          </div>
+          <div class="slide-entry">
+            <span>2°</span>
+            <input type="text" name="slide2" placeholder="Nº diapositiva" inputmode="numeric">
+          </div>
+          <div class="slide-entry">
+            <span>3°</span>
+            <input type="text" name="slide3" placeholder="Nº diapositiva" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 7. Comentarios ── -->
+      <p class="section-title">Comentarios y sugerencias</p>
+
+      <div class="field">
+        <label>¿En qué áreas de la posventa cree que GiPA debería investigar más?</label>
+        <textarea name="areas_investigacion" placeholder="Ej. lubricantes, neumáticos, filtros…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>¿Tiene alguna sugerencia adicional para mejorar su experiencia?</label>
+        <textarea name="sugerencias" placeholder="Cualquier comentario es bienvenido…"></textarea>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-enviar">Enviar respuestas →</button>
+
+      <div class="footer">El equipo GiPA · Gracias por su colaboración</div>
+    </form>
+  </div>
+
+  <script>
+    // ─── Pegá aquí la URL de tu Google Apps Script ───────────────────
+    const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwVixXMZw6gcvd0MouTVCCXZ60mpvj1MrlJfzbdPQbMReAQIjqQp2uPUV1Uq9K_pT-Gag/exec';
+    // ─────────────────────────────────────────────────────────────────
+
+    const form = document.querySelector('form[name="encuesta"]');
+    const btn = document.getElementById('btn-enviar');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+      btn.style.opacity = '0.75';
+
+      const data = {};
+      new FormData(form).forEach((v, k) => { data[k] = v; });
+
+      try {
+        await fetch(SHEETS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' }
+        });
+      } catch (_) {}
+
+      window.location.href = 'gracias.html';
+    });
+  </script>
+
+</body>
+
+</html>

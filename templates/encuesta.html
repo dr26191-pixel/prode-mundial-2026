@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta de Satisfacción – GiPA Plenaria</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      padding: 24px 16px 48px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+      max-width: 760px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #1a3c6e 0%, #2563eb 100%);
+      color: #fff;
+      padding: 32px 40px 24px;
+    }
+    .header h1 { font-size: 1.5rem; font-weight: 700; }
+    .header p  { font-size: 0.95rem; margin-top: 6px; opacity: 0.85; }
+    form { padding: 32px 40px; }
+
+    /* ── Section headings ── */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #2563eb;
+      margin: 32px 0 16px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #dbeafe;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ── Standard fields ── */
+    .field { margin-bottom: 18px; }
+    label  { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+    label .req { color: #e53e3e; margin-left: 2px; }
+    input[type=text], textarea, select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      transition: border-color .2s;
+    }
+    input[type=text]:focus, textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px #dbeafe;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── Radio groups (standard) ── */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+    .radio-group label {
+      font-weight: 400;
+      display: flex; align-items: center; gap: 6px;
+      background: #f7fafc;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 7px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .radio-group input[type=radio] { accent-color: #2563eb; }
+    .radio-group label:has(input:checked) {
+      background: #dbeafe;
+      border-color: #2563eb;
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    /* ── 1-10 scale ── */
+    .scale-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .scale-table thead th {
+      font-weight: 700;
+      padding: 6px 4px;
+      text-align: center;
+      color: #4a5568;
+    }
+    .scale-table thead .lbl-left  { text-align: left;  color: #e53e3e; }
+    .scale-table thead .lbl-right { text-align: right; color: #38a169; }
+    .scale-table tbody tr:nth-child(odd)  { background: #f7fafc; }
+    .scale-table tbody tr:nth-child(even) { background: #fff; }
+    .scale-table td {
+      padding: 8px 4px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .scale-table td.question {
+      text-align: left;
+      padding-left: 10px;
+      max-width: 260px;
+      font-size: 0.88rem;
+    }
+    .scale-table input[type=radio] { accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer; }
+
+    /* ── Satisfaction emoji scale ── */
+    .satis-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .satis-group input[type=radio] { display: none; }
+    .satis-group label {
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 4px 8px;
+      transition: all .15s;
+      font-size: 0.78rem;
+      color: #718096;
+    }
+    .satis-group label .emoji { font-size: 1.8rem; display: block; margin-bottom: 4px; }
+    .satis-group input[type=radio]:checked + label {
+      border-color: #2563eb;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 700;
+    }
+
+    /* ── Slide number inputs ── */
+    .slide-row { display: flex; gap: 12px; align-items: center; }
+    .slide-row span { font-size: 0.88rem; color: #718096; white-space: nowrap; }
+    .slide-row input { width: 90px; }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      margin-top: 32px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a3c6e, #2563eb);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 9px;
+      cursor: pointer;
+      letter-spacing: .03em;
+      transition: opacity .2s;
+    }
+    .btn-submit:hover { opacity: 0.88; }
+
+    /* ── Responsive ── */
+    @media (max-width: 560px) {
+      .header, form { padding: 20px 18px; }
+      .scale-table { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <h1>Encuesta de Satisfacción – Plenaria GiPA</h1>
+    <p>Sus respuestas son anónimas y nos ayudan a mejorar. Gracias por su tiempo.</p>
+  </div>
+
+  <form action="/submit" method="POST">
+
+    <!-- ── 1. Datos personales ── -->
+    <p class="section-title">Datos personales</p>
+
+    <div class="field">
+      <label>Nombre del asistente <span class="req">*</span></label>
+      <input type="text" name="nombre" required placeholder="Ej. Ana García">
+    </div>
+    <div class="field">
+      <label>Empresa <span class="req">*</span></label>
+      <input type="text" name="empresa" required placeholder="Nombre de su empresa">
+    </div>
+    <div class="field">
+      <label>Posición / Cargo <span class="req">*</span></label>
+      <input type="text" name="cargo" required placeholder="Ej. Gerente Comercial">
+    </div>
+
+    <div class="field">
+      <label>Sector <span class="req">*</span></label>
+      <div class="radio-group">
+        {% for s in [
+          "Automotriz", "Autopartista", "Lubricantes / Petroleras",
+          "Neumáticos", "Autocentro / Servicio Rápido",
+          "Grupo de distribución / Grupo de compra", "Otro"
+        ] %}
+        <label><input type="radio" name="sector" value="{{ s }}" required> {{ s }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ── 2. Primera vez ── -->
+    <p class="section-title">Asistencia a plenarias GiPA</p>
+
+    <div class="field">
+      <label>¿Es la primera vez que asiste a una plenaria de GiPA? <span class="req">*</span></label>
+      <div class="radio-group">
+        <label><input type="radio" name="primera_vez" value="Sí" required> Sí</label>
+        <label><input type="radio" name="primera_vez" value="No"> No</label>
+      </div>
+    </div>
+
+    <!-- ── 3. Evaluación 1–10 ── -->
+    <p class="section-title">Evaluación de la plenaria&ensp;(1 = Malo &nbsp;·&nbsp; 10 = Muy bueno)</p>
+
+    <table class="scale-table">
+      <thead>
+        <tr>
+          <th></th>
+          {% for n in range(1, 11) %}<th>{{ n }}</th>{% endfor %}
+        </tr>
+        <tr>
+          <th class="lbl-left">Aspecto</th>
+          <th class="lbl-left" colspan="3" style="text-align:left;font-weight:400;color:#e53e3e;font-size:0.78rem;">← Malo</th>
+          <th colspan="4"></th>
+          <th class="lbl-right" colspan="3" style="text-align:right;font-weight:400;color:#38a169;font-size:0.78rem;">Muy bueno →</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set items = [
+          ("eval_utilidad",         "Utilidad de las informaciones para mi trabajo"),
+          ("eval_interes",          "Interés de la plenaria"),
+          ("eval_calidad_analisis", "Calidad de los análisis e informaciones"),
+          ("eval_orador",           "Preparación y habilidades del orador"),
+          ("eval_diapositivas",     "Calidad y características de las diapositivas"),
+          ("eval_material",         "Material entregado en su asistencia"),
+        ] %}
+        {% for name, label in items %}
+        <tr>
+          <td class="question">{{ label }}</td>
+          {% for n in range(1, 11) %}
+          <td><input type="radio" name="{{ name }}" value="{{ n }}" required></td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- ── 4. Duración ── -->
+    <p class="section-title">Duración y utilidad</p>
+
+    <div class="field">
+      <label>La duración de la plenaria para usted fue <span class="req">*</span></label>
+      <div class="radio-group">
+        {% for d in ["Demasiado larga", "Adecuada", "Demasiado corta"] %}
+        <label><input type="radio" name="duracion" value="{{ d }}" required> {{ d }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Qué tan útil fue para usted venir a la plenaria? <span class="req">*</span></label>
+      <div class="radio-group">
+        {% for u in ["Nada útil", "Poco útil", "Útil", "Muy útil"] %}
+        <label><input type="radio" name="utilidad_visita" value="{{ u }}" required> {{ u }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Por qué?</label>
+      <textarea name="porque_utilidad" placeholder="Cuéntenos el motivo…"></textarea>
+    </div>
+
+    <!-- ── 5. Satisfacción general ── -->
+    <p class="section-title">Satisfacción general</p>
+
+    <div class="field">
+      <label>¿Cómo es su satisfacción general con esta plenaria? <span class="req">*</span></label>
+      <div class="satis-group">
+        <input type="radio" name="satisfaccion_general" id="sg1" value="1" required>
+        <label for="sg1"><span class="emoji">😞</span>Nada<br>satisfecho</label>
+
+        <input type="radio" name="satisfaccion_general" id="sg2" value="2">
+        <label for="sg2"><span class="emoji">😕</span>Poco<br>satisfecho</label>
+
+        <input type="radio" name="satisfaccion_general" id="sg3" value="3">
+        <label for="sg3"><span class="emoji">😐</span>Neutral</label>
+
+        <input type="radio" name="satisfaccion_general" id="sg4" value="4">
+        <label for="sg4"><span class="emoji">😊</span>Satisfecho</label>
+
+        <input type="radio" name="satisfaccion_general" id="sg5" value="5">
+        <label for="sg5"><span class="emoji">😄</span>Muy<br>satisfecho</label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>En caso de encontrarse insatisfecho, ¿por qué razón?</label>
+      <textarea name="razon_insatisfaccion" placeholder="Opcional…"></textarea>
+    </div>
+
+    <!-- ── 6. Slides de interés ── -->
+    <p class="section-title">Slides de especial interés</p>
+
+    <div class="field">
+      <label>¿Cuáles slides le parecieron de especial interés? (indique el número por orden de interés)</label>
+      <div class="slide-row">
+        <span>1°</span><input type="text" name="slide1" placeholder="Nº diapositiva">
+        <span>2°</span><input type="text" name="slide2" placeholder="Nº diapositiva">
+        <span>3°</span><input type="text" name="slide3" placeholder="Nº diapositiva">
+      </div>
+    </div>
+
+    <!-- ── 7. Áreas e investigación ── -->
+    <p class="section-title">Comentarios y sugerencias</p>
+
+    <div class="field">
+      <label>¿En qué áreas de la posventa cree que GiPA debería investigar más?</label>
+      <textarea name="areas_investigacion" placeholder="Ej. lubricantes, neumáticos, filtros…"></textarea>
+    </div>
+
+    <div class="field">
+      <label>¿Tiene alguna sugerencia adicional para mejorar su experiencia con nuestros servicios?</label>
+      <textarea name="sugerencias" placeholder="Cualquier comentario es bienvenido…"></textarea>
+    </div>
+
+    <button type="submit" class="btn-submit">Enviar respuestas</button>
+  </form>
+</div>
+</body>
+</html>

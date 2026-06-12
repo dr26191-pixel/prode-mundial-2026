@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin – Prode Mundial 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green:#1a5c2e; --green2:#27ae60; --gold:#f0c040; --red:#e74c3c; --gray:#5a5a5a; --light:#f4f7f4; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
+    .header { background: linear-gradient(135deg,var(--green),#0e3a1c); color:#fff;
+              padding:20px; text-align:center; }
+    .header h1 { font-size:1.3rem; font-weight:800; }
+    .header p  { font-size:.82rem; opacity:.75; margin-top:3px; }
+    .header-links { margin-top:12px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    .header-links a { background:rgba(255,255,255,.15); color:#fff; text-decoration:none;
+      padding:7px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
+      border:1px solid rgba(255,255,255,.25); }
+
+    .container { max-width:800px; margin:0 auto; padding:24px 16px 60px; }
+    .flash { background:#d4edda; border:1px solid #c3e6cb; border-radius:8px;
+             padding:10px 16px; margin-bottom:18px; font-size:.9rem; color:#155724; }
+    .flash.err { background:#f8d7da; border-color:#f5c6cb; color:#721c24; }
+
+    .section { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08);
+               padding:22px; margin-bottom:22px; }
+    .section h2 { font-size:1rem; font-weight:800; color:var(--green); margin-bottom:16px; }
+
+    .form-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+    .form-field { display:flex; flex-direction:column; flex:1; min-width:100px; }
+    .form-field label { font-size:.78rem; font-weight:700; color:var(--gray); margin-bottom:4px; }
+    .form-field input, .form-field select {
+      padding:9px 11px; border:1.5px solid #d0d0d0; border-radius:7px;
+      font-size:15px; font-family:inherit;
+    }
+    .form-field input:focus, .form-field select:focus {
+      outline:none; border-color:var(--green2); box-shadow:0 0 0 3px rgba(39,174,96,.12);
+    }
+
+    .btn { padding:9px 20px; border:none; border-radius:7px; font-weight:700;
+           font-size:.88rem; cursor:pointer; text-decoration:none; display:inline-block; }
+    .btn-green { background:var(--green2); color:#fff; }
+    .btn-gold  { background:var(--gold); color:#333; }
+    .btn-red   { background:var(--red); color:#fff; }
+    .btn-gray  { background:#6c757d; color:#fff; }
+    .btn-sm    { padding:6px 14px; font-size:.8rem; }
+
+    .partido-row {
+      border:1px solid #e8e8e8; border-radius:8px; padding:12px 14px; margin-bottom:8px;
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    }
+    .partido-info { flex:1; min-width:180px; }
+    .partido-info .teams { font-weight:700; font-size:.95rem; }
+    .partido-info .meta  { font-size:.75rem; color:var(--gray); margin-top:2px; }
+    .partido-info .resultado { font-size:.82rem; color:var(--green); font-weight:700; margin-top:3px; }
+    .partido-acciones { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .partido-acciones form { display:flex; gap:6px; align-items:center; }
+
+    .score-in { width:44px; height:36px; text-align:center; border:1.5px solid #d0d0d0;
+      border-radius:6px; font-size:1rem; font-weight:700;
+      -moz-appearance:textfield; padding:0; }
+    .score-in::-webkit-outer-spin-button, .score-in::-webkit-inner-spin-button { -webkit-appearance:none; }
+
+    .export-row { display:flex; gap:10px; flex-wrap:wrap; }
+    .no-data { text-align:center; color:var(--gray); padding:20px 0; font-size:.9rem; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>⚙️ Panel de administración</h1>
+  <p>Prode Mundial 2026</p>
+  <div class="header-links">
+    <a href="/">🏠 Inicio</a>
+    <a href="/tabla">🏆 Tabla</a>
+    <a href="/todos">👥 Todos</a>
+    <a href="/admin/logout">Cerrar sesión</a>
+  </div>
+</div>
+
+<div class="container">
+  {% with msgs = get_flashed_messages() %}
+    {% if msgs %}
+      <div class="flash {{ 'err' if 'Error' in msgs[0] else '' }}">{{ msgs[0] }}</div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Agregar partido ── -->
+  <div class="section">
+    <h2>➕ Agregar partido</h2>
+    <form action="/admin/partido" method="POST">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Fase</label>
+          <select name="fase">
+            <option>Grupos</option>
+            <option>Octavos</option>
+            <option>Cuartos</option>
+            <option>Semifinal</option>
+            <option>Tercer puesto</option>
+            <option>Final</option>
+          </select>
+        </div>
+        <div class="form-field" style="flex:2">
+          <label>Equipo Local</label>
+          <input type="text" name="local" placeholder="Ej. Argentina" required>
+        </div>
+        <div class="form-field" style="flex:2">
+          <label>Equipo Visitante</label>
+          <input type="text" name="visitante" placeholder="Ej. Brasil" required>
+        </div>
+        <div class="form-field">
+          <label>Fecha</label>
+          <input type="text" name="fecha" placeholder="Ej. 14/06">
+        </div>
+        <div style="align-self:flex-end">
+          <button class="btn btn-green" type="submit">Agregar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ── Lista de partidos ── -->
+  <div class="section">
+    <h2>⚽ Partidos cargados</h2>
+    {% if partidos %}
+      {% for p in partidos %}
+      <div class="partido-row">
+        <div class="partido-info">
+          <div class="teams">{{ p.equipo_local }} vs {{ p.equipo_visit }}</div>
+          <div class="meta">{{ p.fase }}{% if p.fecha %} · {{ p.fecha }}{% endif %}</div>
+          {% if p.goles_local is not none and p.goles_visit is not none %}
+          <div class="resultado">Resultado: {{ p.goles_local }} – {{ p.goles_visit }}</div>
+          {% endif %}
+        </div>
+        <div class="partido-acciones">
+          <form action="/admin/resultado" method="POST">
+            <input type="hidden" name="partido_id" value="{{ p.id }}">
+            <input class="score-in" type="number" name="goles_local" min="0" max="99"
+                   value="{{ p.goles_local if p.goles_local is not none else '' }}"
+                   placeholder="0" inputmode="numeric">
+            <span style="font-weight:900;color:#5a5a5a">–</span>
+            <input class="score-in" type="number" name="goles_visit" min="0" max="99"
+                   value="{{ p.goles_visit if p.goles_visit is not none else '' }}"
+                   placeholder="0" inputmode="numeric">
+            <button class="btn btn-gold btn-sm" type="submit">✔ Resultado</button>
+          </form>
+          <form action="/admin/borrar-partido/{{ p.id }}" method="POST"
+                onsubmit="return confirm('¿Borrar {{ p.equipo_local }} vs {{ p.equipo_visit }}?')">
+            <button class="btn btn-red btn-sm" type="submit">🗑</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="no-data">No hay partidos cargados todavía.</p>
+    {% endif %}
+  </div>
+
+  <!-- ── Exportar ── -->
+  <div class="section">
+    <h2>📤 Exportar datos</h2>
+    <div class="export-row">
+      <a href="/admin/export-csv" class="btn btn-green">⬇ Descargar CSV</a>
+      <a href="/admin/sync-sheets" class="btn btn-gray">☁ Sincronizar Google Sheets</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prode Mundial 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:  #1a5c2e;
+      --green2: #27ae60;
+      --gold:   #f0c040;
+      --dark:   #111;
+      --gray:   #5a5a5a;
+      --light:  #f4f7f4;
+      --white:  #fff;
+      --red:    #e74c3c;
+    }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--dark); }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, var(--green) 0%, #0e3a1c 100%);
+      color: var(--white);
+      padding: 22px 20px 18px;
+      text-align: center;
+      position: relative;
+    }
+    .header h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: .04em; }
+    .header h1 span { color: var(--gold); }
+    .header p { font-size: 0.85rem; opacity: .8; margin-top: 4px; }
+    .header-links { margin-top: 14px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .header-links a {
+      background: rgba(255,255,255,0.15);
+      color: var(--white);
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: background .15s;
+    }
+    .header-links a:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── Layout ── */
+    .container { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* ── Flash messages ── */
+    .flash { background: #fef3cd; border: 1px solid #f0c040; border-radius: 8px;
+             padding: 10px 16px; margin-bottom: 16px; font-size: 0.9rem; color: #7d5a00; }
+
+    /* ── Nombre card ── */
+    .nombre-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      padding: 20px 22px;
+      margin-bottom: 24px;
+    }
+    .nombre-card label { font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 8px; }
+    .nombre-card input {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #d0d0d0;
+      border-radius: 8px; font-size: 16px; font-family: inherit;
+    }
+    .nombre-card input:focus { outline: none; border-color: var(--green2); box-shadow: 0 0 0 3px rgba(39,174,96,.15); }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--green);
+      margin: 28px 0 14px; padding-bottom: 6px;
+      border-bottom: 2px solid #c8e6c9;
+    }
+
+    /* ── Partido card ── */
+    .partido {
+      background: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.07);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+    .partido .equipo { font-weight: 700; font-size: 0.95rem; }
+    .partido .equipo.local { text-align: right; }
+    .partido .equipo.visit { text-align: left; }
+    .partido .fecha { font-size: 0.75rem; color: var(--gray); text-align: center; margin-top: 2px; }
+    .partido .fase-tag {
+      font-size: 0.68rem; background: #e8f5e9; color: var(--green);
+      border-radius: 4px; padding: 2px 7px; font-weight: 700;
+      text-align: center; margin-bottom: 4px;
+    }
+    .score-inputs {
+      display: flex; align-items: center; gap: 6px; justify-content: center;
+    }
+    .score-inputs input {
+      width: 48px; height: 44px; text-align: center;
+      border: 1.5px solid #d0d0d0; border-radius: 8px;
+      font-size: 1.2rem; font-weight: 700; font-family: inherit;
+      -moz-appearance: textfield;
+    }
+    .score-inputs input::-webkit-outer-spin-button,
+    .score-inputs input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .score-inputs input:focus { outline: none; border-color: var(--green2); box-shadow: 0 0 0 3px rgba(39,174,96,.15); }
+    .score-inputs .sep { font-size: 1.2rem; font-weight: 900; color: var(--gray); }
+
+    /* ── Submit button ── */
+    .btn-submit {
+      margin-top: 28px; width: 100%; padding: 15px;
+      background: linear-gradient(135deg, var(--green), var(--green2));
+      color: var(--white); font-size: 1.05rem; font-weight: 700;
+      border: none; border-radius: 10px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(27,92,46,.35);
+      transition: opacity .2s;
+    }
+    .btn-submit:active { opacity: .85; }
+
+    /* ── No partidos ── */
+    .empty { text-align: center; color: var(--gray); padding: 40px 0; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>⚽ Prode <span>Mundial 2026</span></h1>
+  <p>Ingresá tu pronóstico para cada partido</p>
+  <div class="header-links">
+    <a href="/tabla">🏆 Tabla</a>
+    <a href="/todos">👥 Todos los pronósticos</a>
+  </div>
+</div>
+
+<div class="container">
+  {% with msgs = get_flashed_messages() %}
+    {% if msgs %}<div class="flash">{{ msgs[0] }}</div>{% endif %}
+  {% endwith %}
+
+  {% if partidos %}
+  <form action="/pronostico" method="POST">
+
+    <div class="nombre-card">
+      <label for="nombre">Tu nombre o alias</label>
+      <input type="text" id="nombre" name="nombre" placeholder="Ej. Diego" required autocomplete="nickname">
+    </div>
+
+    {% set fases = partidos | map(attribute='fase') | list | unique | list %}
+    {% for fase in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
+      {% set partidos_fase = partidos | selectattr('fase','equalto', fase) | list %}
+      {% if partidos_fase %}
+    <p class="section-title">{{ fase }}</p>
+    {% for p in partidos_fase %}
+    <div class="partido">
+      <div class="equipo local">{{ p.equipo_local }}</div>
+      <div>
+        <div class="fase-tag">{{ p.fase }}</div>
+        <div class="score-inputs">
+          <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+          <span class="sep">–</span>
+          <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+        </div>
+        {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
+      </div>
+      <div class="equipo visit">{{ p.equipo_visit }}</div>
+    </div>
+    {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+    {# Partidos con fases que no están en la lista fija #}
+    {% for p in partidos %}
+      {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
+      {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
+    <div class="partido">
+      <div class="equipo local">{{ p.equipo_local }}</div>
+      <div>
+        <div class="fase-tag">{{ p.fase }}</div>
+        <div class="score-inputs">
+          <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+          <span class="sep">–</span>
+          <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+        </div>
+        {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
+      </div>
+      <div class="equipo visit">{{ p.equipo_visit }}</div>
+    </div>
+      {% endif %}
+    {% endfor %}
+
+    <button type="submit" class="btn-submit">Guardar mis pronósticos →</button>
+  </form>
+  {% else %}
+  <div class="empty">
+    <p>⏳ Todavía no hay partidos cargados.</p>
+    <p style="margin-top:8px;font-size:.85rem;">El admin va a agregar los partidos pronto.</p>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>

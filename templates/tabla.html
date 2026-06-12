@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabla de posiciones – Prode Mundial 2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --green:#1a5c2e; --green2:#27ae60; --gold:#f0c040; --gray:#5a5a5a; --light:#f4f7f4; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
+    .header { background: linear-gradient(135deg,var(--green),#0e3a1c); color:#fff;
+              padding:22px 20px 18px; text-align:center; }
+    .header h1 { font-size:1.4rem; font-weight:800; }
+    .header p  { font-size:.85rem; opacity:.8; margin-top:4px; }
+    .header-links { margin-top:12px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
+    .header-links a { background:rgba(255,255,255,.15); color:#fff; text-decoration:none;
+      padding:7px 16px; border-radius:20px; font-size:.85rem; font-weight:600;
+      border:1px solid rgba(255,255,255,.25); }
+    .container { max-width:640px; margin:0 auto; padding:28px 16px 48px; }
+
+    /* ── Podio top 3 ── */
+    .podio { display:flex; justify-content:center; align-items:flex-end; gap:12px; margin-bottom:32px; }
+    .podio-item { text-align:center; flex:1; max-width:140px; }
+    .podio-item .corona { font-size:1.8rem; }
+    .podio-item .nombre { font-weight:800; font-size:.92rem; margin:4px 0; word-break:break-word; }
+    .podio-item .pts { font-size:1.4rem; font-weight:900; }
+    .podio-item .bloque { border-radius:10px 10px 0 0; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; color:#fff; }
+    .pos1 .bloque { background:var(--gold); color:#333; height:80px; }
+    .pos2 .bloque { background:#b0bec5; height:60px; }
+    .pos3 .bloque { background:#cd7f32; height:44px; }
+    .pos1 .pts { color: #c49a00; }
+
+    /* ── Tabla ── */
+    .tabla-wrap { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08); overflow:hidden; }
+    table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    thead th { background:var(--green); color:#fff; padding:11px 14px; text-align:left; font-weight:700; }
+    thead th:not(:first-child) { text-align:center; }
+    tbody tr:nth-child(even) { background:#f9fdf9; }
+    tbody td { padding:11px 14px; border-bottom:1px solid #e8e8e8; }
+    tbody td:not(:first-child):not(:nth-child(2)) { text-align:center; }
+    .rank { font-weight:900; color:var(--gray); font-size:.85rem; }
+    .rank-1 { color:var(--gold); font-size:1.1rem; }
+    .rank-2 { color:#888; }
+    .rank-3 { color:#cd7f32; }
+    .nombre-link { font-weight:700; color:var(--green); text-decoration:none; }
+    .nombre-link:hover { text-decoration:underline; }
+    .pts-col { font-weight:900; font-size:1.05rem; color:var(--green); }
+
+    .empty { text-align:center; padding:48px 20px; color:var(--gray); }
+    .info  { font-size:.8rem; color:var(--gray); text-align:center; margin-top:16px; }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>🏆 Tabla de posiciones</h1>
+  <p>Prode Mundial 2026</p>
+  <div class="header-links">
+    <a href="/">🏠 Cargar pronósticos</a>
+    <a href="/todos">👥 Ver todos</a>
+  </div>
+</div>
+
+<div class="container">
+  {% if tabla %}
+
+  {% if tabla | length >= 3 %}
+  <div class="podio">
+    <div class="podio-item pos2">
+      <div class="corona">🥈</div>
+      <div class="nombre">{{ tabla[1].nombre }}</div>
+      <div class="pts">{{ tabla[1].total }}</div>
+      <div class="bloque">2°</div>
+    </div>
+    <div class="podio-item pos1">
+      <div class="corona">🥇</div>
+      <div class="nombre">{{ tabla[0].nombre }}</div>
+      <div class="pts">{{ tabla[0].total }}</div>
+      <div class="bloque">1°</div>
+    </div>
+    <div class="podio-item pos3">
+      <div class="corona">🥉</div>
+      <div class="nombre">{{ tabla[2].nombre }}</div>
+      <div class="pts">{{ tabla[2].total }}</div>
+      <div class="bloque">3°</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="tabla-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Participante</th>
+          <th>Pts</th>
+          <th>Exactos</th>
+          <th>Result.</th>
+          <th>Jugados</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in tabla %}
+        <tr>
+          <td><span class="rank rank-{{ loop.index if loop.index <= 3 else '' }}">{{ loop.index }}</span></td>
+          <td><a class="nombre-link" href="/mis-pronosticos/{{ row.nombre }}">{{ row.nombre }}</a></td>
+          <td class="pts-col">{{ row.total }}</td>
+          <td>{{ row.exactos }}</td>
+          <td>{{ row.resultados }}</td>
+          <td>{{ row.jugados }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="info">🎯 Exacto = 3 pts &nbsp;·&nbsp; ✅ Resultado = 1 pt</p>
+
+  {% else %}
+  <div class="empty">
+    <p style="font-size:2rem">⏳</p>
+    <p>Todavía no hay puntos calculados.</p>
+    <p style="margin-top:8px;font-size:.85rem;">La tabla aparece cuando el admin cargue los resultados reales.</p>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>
