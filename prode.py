@@ -356,8 +356,9 @@ def sync_sheets():
     return redirect(url_for("admin"))
 
 
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     print("Prode disponible en:  http://localhost:5000")
     print("Tabla de posiciones:  http://localhost:5000/tabla")
     print("Panel admin en:       http://localhost:5000/admin")
