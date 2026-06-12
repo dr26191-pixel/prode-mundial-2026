@@ -8,6 +8,8 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --green:#1a5c2e; --green2:#27ae60; --gold:#f0c040; --gray:#5a5a5a; --light:#f4f7f4; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
+
+    /* ── Header ── */
     .header { background: linear-gradient(135deg,var(--green),#0e3a1c); color:#fff;
               padding:20px; text-align:center; }
     .header h1 { font-size:1.3rem; font-weight:800; }
@@ -16,32 +18,75 @@
     .header-links a { background:rgba(255,255,255,.15); color:#fff; text-decoration:none;
       padding:7px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
       border:1px solid rgba(255,255,255,.25); }
-    .container { max-width:900px; margin:0 auto; padding:24px 16px 60px; }
 
-    /* ── Tabla grande ── */
-    .tabla-wrap { background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.08);
-                  overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; font-size:.84rem; white-space:nowrap; }
-    thead th { background:var(--green); color:#fff; padding:10px 14px; font-weight:700;
-               text-align:center; position:sticky; top:0; }
-    thead th.partido-th { min-width:100px; font-size:.75rem; }
-    thead th.nombre-th { text-align:left; min-width:120px; position:sticky; left:0;
-                         z-index:2; background:var(--green); }
-    tbody tr:nth-child(even) { background:#f9fdf9; }
-    tbody td { padding:9px 12px; border-bottom:1px solid #e8e8e8; text-align:center; }
-    tbody td.nombre-td { text-align:left; font-weight:700; position:sticky; left:0;
-                         background:inherit; z-index:1; }
-    tbody td.nombre-td a { color:var(--green); text-decoration:none; }
-    tbody td.nombre-td a:hover { text-decoration:underline; }
+    /* ── Filtros de fase ── */
+    .filtros { display:flex; gap:8px; flex-wrap:wrap; padding:18px 16px 4px;
+               max-width:960px; margin:0 auto; }
+    .filtro-btn { background:#fff; border:1.5px solid #d0d0d0; border-radius:20px;
+                  padding:6px 16px; font-size:.82rem; font-weight:600; cursor:pointer;
+                  color:var(--gray); transition:all .15s; }
+    .filtro-btn:hover, .filtro-btn.active { background:var(--green); color:#fff; border-color:var(--green); }
 
-    .pred { font-weight:700; }
-    .p3 { background:#d4edda; color:#155724; border-radius:4px; padding:1px 6px; }
-    .p1 { background:#fff3cd; color:#856404; border-radius:4px; padding:1px 6px; }
-    .p0 { background:#f8d7da; color:#721c24; border-radius:4px; padding:1px 6px; }
-    .pnd { color:#aaa; font-size:.8rem; }
-    .no-pred { color:#ccc; font-size:.8rem; }
+    .container { max-width:960px; margin:0 auto; padding:12px 16px 60px; }
+
+    /* ── Fecha separador ── */
+    .fecha-sep { font-size:.72rem; font-weight:800; letter-spacing:.1em;
+                 text-transform:uppercase; color:var(--green);
+                 margin:24px 0 10px; padding-bottom:5px;
+                 border-bottom:2px solid #c8e6c9; }
+
+    /* ── Card de partido ── */
+    .partido-card {
+      background:#fff; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.07);
+      margin-bottom:12px; overflow:hidden;
+    }
+
+    /* cabecera del partido */
+    .partido-head {
+      display:grid; grid-template-columns:1fr auto 1fr;
+      align-items:center; gap:10px;
+      padding:12px 16px 10px;
+      border-bottom:1px solid #f0f0f0;
+      background:#fafafa;
+    }
+    .ph-equipo { font-weight:800; font-size:.95rem; }
+    .ph-equipo.local { text-align:right; }
+    .ph-centro { text-align:center; }
+    .ph-resultado {
+      font-size:1.4rem; font-weight:900; color:var(--green); letter-spacing:.04em;
+    }
+    .ph-pendiente { font-size:.75rem; color:#bbb; font-weight:600; }
+    .ph-meta { font-size:.7rem; color:var(--gray); margin-top:2px; }
+    .real-tag { display:inline-block; background:var(--gold); color:#333;
+                border-radius:4px; padding:1px 7px; font-size:.7rem; font-weight:800;
+                margin-top:3px; }
+
+    /* grilla de predicciones */
+    .preds-grid {
+      display:flex; flex-wrap:wrap; gap:8px; padding:10px 14px 12px;
+    }
+    .pred-chip {
+      display:flex; flex-direction:column; align-items:center;
+      background:#f4f7f4; border-radius:8px; padding:6px 10px;
+      min-width:70px; border:1.5px solid transparent;
+    }
+    .pred-chip.p3 { background:#d4edda; border-color:#a3d9a5; }
+    .pred-chip.p1 { background:#fff9e6; border-color:#f0c040; }
+    .pred-chip.p0 { background:#fde8e8; border-color:#f5a5a5; }
+    .pred-chip.pnd { background:#f4f7f4; border-color:#e0e0e0; }
+    .pred-nombre { font-size:.72rem; font-weight:700; color:var(--gray);
+                   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+                   max-width:80px; }
+    .pred-score { font-size:1.05rem; font-weight:900; color:#111; margin-top:1px; }
+    .pred-pts { font-size:.65rem; font-weight:800; margin-top:1px; }
+    .pred-chip.p3 .pred-pts { color:#155724; }
+    .pred-chip.p1 .pred-pts { color:#7d5a00; }
+    .pred-chip.p0 .pred-pts { color:#9b1c1c; }
+    .pred-chip.pnd .pred-pts { color:#aaa; }
+    .sin-pred { font-size:.78rem; color:#ccc; padding:6px 10px; }
 
     .empty { text-align:center; padding:48px 20px; color:var(--gray); }
+    .no-preds { font-size:.8rem; color:#bbb; padding:10px 14px 12px; }
   </style>
 </head>
 <body>
@@ -54,54 +99,100 @@
   </div>
 </div>
 
+{% if partidos and nombres %}
+
+{% set fases_orden = ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
+{% set todas_fases = [] %}
+{% for p in partidos %}
+  {% if p.fase not in todas_fases %}{% set _ = todas_fases.append(p.fase) %}{% endif %}
+{% endfor %}
+
+<div class="filtros">
+  <button class="filtro-btn active" onclick="filtrar(this,'')">Todos</button>
+  {% for fase in fases_orden %}
+    {% if fase in todas_fases %}
+    <button class="filtro-btn" onclick="filtrar(this,'{{ fase }}')">{{ fase }}</button>
+    {% endif %}
+  {% endfor %}
+</div>
+
 <div class="container">
-  {% if partidos and nombres %}
-  <div class="tabla-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th class="nombre-th">Participante</th>
-          {% for p in partidos %}
-          <th class="partido-th">
-            {{ p.equipo_local | truncate(8, True, '') }}<br>vs<br>{{ p.equipo_visit | truncate(8, True, '') }}
-            {% if p.goles_local is not none and p.goles_visit is not none %}
-            <br><span style="color:var(--gold);font-weight:900">{{ p.goles_local }}–{{ p.goles_visit }}</span>
-            {% endif %}
-          </th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
+  {% set fecha_actual = namespace(val='') %}
+  {% for p in partidos %}
+    {% set fecha_disp = p.fecha.split(' ')[0] if p.fecha else '' %}
+    {% if fecha_disp != fecha_actual.val %}
+      {% set fecha_actual.val = fecha_disp %}
+      <div class="fecha-sep" data-fase="{{ p.fase }}">{{ fecha_disp if fecha_disp else 'Sin fecha' }}</div>
+    {% endif %}
+
+    <div class="partido-card" data-fase="{{ p.fase }}">
+      <div class="partido-head">
+        <div class="ph-equipo local">
+          {{ banderas.get(p.equipo_local, '') }} {{ p.equipo_local }}
+        </div>
+        <div class="ph-centro">
+          {% if p.goles_local is not none and p.goles_visit is not none %}
+            <div class="ph-resultado">{{ p.goles_local }} – {{ p.goles_visit }}</div>
+            <div class="real-tag">RESULTADO REAL</div>
+          {% else %}
+            <div class="ph-pendiente">vs</div>
+          {% endif %}
+          <div class="ph-meta">{{ p.fase }}</div>
+        </div>
+        <div class="ph-equipo">
+          {{ p.equipo_visit }} {{ banderas.get(p.equipo_visit, '') }}
+        </div>
+      </div>
+
+      <div class="preds-grid">
+        {% set hay_preds = namespace(val=false) %}
         {% for nombre in nombres %}
-        <tr>
-          <td class="nombre-td"><a href="/mis-pronosticos/{{ nombre }}">{{ nombre }}</a></td>
-          {% for p in partidos %}
-            {% if p.id in pronosticos[nombre] %}
-              {% set pr = pronosticos[nombre][p.id] %}
-              <td>
-                {% if pr.puntos is not none %}
-                  <span class="pred {{ 'p3' if pr.puntos==3 else ('p1' if pr.puntos==1 else 'p0') }}">
-                    {{ pr.goles_local }}–{{ pr.goles_visit }}
-                  </span>
-                {% else %}
-                  <span class="pred pnd">{{ pr.goles_local }}–{{ pr.goles_visit }}</span>
-                {% endif %}
-              </td>
+          {% if p.id in pronosticos[nombre] %}
+            {% set hay_preds.val = true %}
+            {% set pr = pronosticos[nombre][p.id] %}
+            {% if pr.puntos is not none %}
+              {% set cls = 'p3' if pr.puntos==3 else ('p1' if pr.puntos==1 else 'p0') %}
+              {% set pts_txt = '🎯 Exacto' if pr.puntos==3 else ('✅ Result.' if pr.puntos==1 else '❌ Error') %}
             {% else %}
-              <td class="no-pred">–</td>
+              {% set cls = 'pnd' %}
+              {% set pts_txt = 'pendiente' %}
             {% endif %}
-          {% endfor %}
-        </tr>
+            <div class="pred-chip {{ cls }}">
+              <span class="pred-nombre">{{ nombre }}</span>
+              <span class="pred-score">{{ pr.goles_local }}–{{ pr.goles_visit }}</span>
+              <span class="pred-pts">{{ pts_txt }}</span>
+            </div>
+          {% endif %}
         {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% else %}
+        {% if not hay_preds.val %}
+          <p class="no-preds">Nadie cargó pronóstico para este partido todavía.</p>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="container">
   <div class="empty">
     <p style="font-size:2rem">📋</p>
     <p>Todavía no hay pronósticos cargados.</p>
   </div>
-  {% endif %}
 </div>
+{% endif %}
+
+<script>
+function filtrar(btn, fase) {
+  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.partido-card, .fecha-sep').forEach(el => {
+    if (!fase || el.dataset.fase === fase) {
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+</script>
 </body>
 </html>
