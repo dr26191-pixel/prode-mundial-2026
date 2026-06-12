@@ -85,9 +85,10 @@
       align-items: center;
       gap: 12px;
     }
-    .partido .equipo { font-weight: 700; font-size: 0.95rem; }
-    .partido .equipo.local { text-align: right; }
-    .partido .equipo.visit { text-align: left; }
+    .partido .equipo { font-weight: 700; font-size: 0.92rem; display:flex; align-items:center; gap:5px; }
+    .partido .equipo.local { justify-content: flex-end; }
+    .partido .equipo.visit { justify-content: flex-start; }
+    .partido .equipo img { flex-shrink:0; }
     .partido .fecha { font-size: 0.75rem; color: var(--gray); text-align: center; margin-top: 2px; }
     .partido .fase-tag {
       font-size: 0.68rem; background: #e8f5e9; color: var(--green);
