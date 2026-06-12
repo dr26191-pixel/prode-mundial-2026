@@ -157,6 +157,22 @@
 
     /* ── No partidos ── */
     .empty { text-align: center; color: var(--gray); padding: 40px 0; font-size: 1rem; }
+
+    /* ── Pronósticos cerrados ── */
+    .cerrado-banner {
+      background: linear-gradient(135deg, var(--azul3), var(--azul2));
+      color: #fff; border-radius: 12px; padding: 28px 24px; text-align: center;
+      margin-bottom: 24px; box-shadow: 0 4px 16px rgba(45,111,160,.3);
+    }
+    .cerrado-banner h2 { font-size: 1.3rem; font-weight: 900; margin-bottom: 8px; }
+    .cerrado-banner p  { font-size: .92rem; opacity: .9; }
+    .cerrado-banner .links { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .cerrado-banner .links a {
+      background: rgba(255,255,255,.2); color: #fff; text-decoration: none;
+      padding: 9px 20px; border-radius: 20px; font-weight: 700; font-size: .9rem;
+      border: 1px solid rgba(255,255,255,.4);
+    }
+    .cerrado-banner .links a:hover { background: rgba(255,255,255,.35); }
   </style>
 </head>
 <body>
@@ -183,7 +199,18 @@
     {% if msgs %}<div class="flash">{{ msgs[0] }}</div>{% endif %}
   {% endwith %}
 
-  {% if partidos %}
+  {% if not abierto %}
+  <div class="cerrado-banner">
+    <h2>🔒 Pronósticos cerrados</h2>
+    <p>El plazo para cargar pronósticos venció el 15 de junio.<br>¡Ahora a ver quién acertó más!</p>
+    <div class="links">
+      <a href="/tabla">🏆 Ver tabla de posiciones</a>
+      <a href="/todos">👥 Ver todos los pronósticos</a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if partidos and abierto %}
   <form action="/pronostico" method="POST">
 
     <div class="nombre-card">
@@ -256,6 +283,8 @@
 
     <button type="submit" class="btn-submit">Guardar mis pronósticos →</button>
   </form>
+  {% elif not abierto %}
+  {# banner ya mostrado arriba #}
   {% else %}
   <div class="empty">
     <p>⏳ Todavía no hay partidos cargados.</p>

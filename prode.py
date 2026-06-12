@@ -90,6 +90,10 @@ app.jinja_env.globals["banderas"]    = FLAG_CODES  # por si algún template usa 
 ADMIN_PASSWORD      = os.environ.get("ADMIN_PASSWORD", "gipa2026")
 DATABASE_URL        = os.environ.get("DATABASE_URL")        # Render lo setea automáticamente
 FOOTBALL_DATA_KEY   = os.environ.get("FOOTBALL_DATA_KEY", "")
+FECHA_CIERRE        = "2026-06-15"   # pronósticos abiertos hasta este día inclusive
+
+def pronosticos_abiertos():
+    return datetime.now().date() <= datetime.strptime(FECHA_CIERRE, "%Y-%m-%d").date()
 
 # SQLite (local)
 DB = os.path.join(os.path.dirname(__file__), "prode.db")
@@ -239,10 +243,14 @@ def calcular_puntos(pl, pv, rl, rv):
 def index():
     cur = db_execute("SELECT * FROM partidos ORDER BY fecha, id")
     partidos = fetchall(cur)
-    return render_template("index.html", partidos=partidos)
+    return render_template("index.html", partidos=partidos,
+                           abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE)
 
 @app.route("/pronostico", methods=["POST"])
 def pronostico():
+    if not pronosticos_abiertos():
+        flash("Los pronósticos están cerrados desde el 16 de junio.")
+        return redirect(url_for("index"))
     nombre = request.form.get("nombre", "").strip()
     if not nombre:
         flash("Ingresá tu nombre para guardar los pronósticos.")
