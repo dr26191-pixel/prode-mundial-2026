@@ -7,94 +7,174 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --azul:#74ACDF; --azul2:#4A90D9; --azul3:#2D6FA0;
-      --gold:#F6B40E; --gray:#5a5a5a; --light:#EEF5FC;
+      --azul: #74ACDF; --azul2: #4A90D9; --azul3: #2D6FA0;
+      --gold: #F6B40E; --gray: #5a5a5a; --light: #EEF5FC; --white: #fff;
     }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: #111; }
 
     /* ── Header ── */
-    .header { background: linear-gradient(180deg,var(--azul) 0%,#fff 50%,var(--azul) 100%);
-              border-bottom:3px solid var(--azul2); padding:16px 20px 0; text-align:center; }
-    .header h1 { font-size:1.25rem; font-weight:900; color:var(--azul3); }
-    .header p  { font-size:.82rem; color:var(--azul3); opacity:.8; margin-top:2px; margin-bottom:12px; }
-    .header-links { background:var(--azul2); margin:0 -20px; padding:8px 20px;
-                    display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-    .header-links a { background:rgba(255,255,255,.18); color:#fff; text-decoration:none;
-      padding:6px 16px; border-radius:20px; font-size:.83rem; font-weight:600;
-      border:1px solid rgba(255,255,255,.3); }
-
-    /* ── Filtros ── */
-    .filtros { display:flex; gap:8px; flex-wrap:wrap; padding:14px 16px 6px; align-items:center; }
-    .filtro-btn { background:#fff; border:1.5px solid var(--azul); border-radius:20px;
-                  padding:5px 14px; font-size:.82rem; font-weight:600; cursor:pointer; color:var(--azul3); }
-    .filtro-btn.active { background:var(--azul2); color:#fff; border-color:var(--azul2); }
-
-    /* ── Tabla ── */
-    .wrap { overflow-x:auto; border-radius:12px; box-shadow:0 2px 14px rgba(45,111,160,.15);
-            margin:0 16px 32px; }
-    table { border-collapse:collapse; width:100%; background:#fff; font-size:.85rem; }
-
-    /* cabecera */
-    thead th {
-      background: linear-gradient(180deg, var(--azul2), var(--azul3));
-      color:#fff; padding:9px 7px; text-align:center;
-      position:sticky; top:0; z-index:2; white-space:nowrap;
+    .header {
+      background: linear-gradient(180deg, var(--azul) 0%, var(--white) 50%, var(--azul) 100%);
+      border-bottom: 4px solid var(--azul2); position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 3px 12px rgba(45,111,160,.25);
     }
-    thead th.th-nombre {
-      text-align:left; min-width:120px; padding-left:14px;
-      position:sticky; left:0; z-index:3;
-      background: linear-gradient(180deg, var(--azul2), var(--azul3));
+    .header-inner { display: flex; align-items: center; justify-content: space-between;
+      max-width: 900px; margin: 0 auto; padding: 10px 20px 6px; gap: 12px; }
+    .header-logo img { height: 60px; }
+    .header-titulo { flex: 1; text-align: center; }
+    .header-titulo h1 { font-size: 1.2rem; font-weight: 900; color: var(--azul3); }
+    .header-titulo h1 span { color: var(--gold); }
+    .header-titulo p { font-size: .78rem; color: var(--azul3); opacity: .85; margin-top: 2px; }
+    .header-messi { height: 100px; width: auto; object-fit: contain;
+                    filter: drop-shadow(2px 3px 5px rgba(0,0,0,.2)); }
+    .header-links { background: var(--azul2); padding: 7px 20px;
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .header-links a { background: rgba(255,255,255,.18); color: #fff; text-decoration: none;
+      padding: 5px 14px; border-radius: 20px; font-size: .83rem; font-weight: 600;
+      border: 1px solid rgba(255,255,255,.3); }
+    .header-links a:hover { background: rgba(255,255,255,.32); }
+
+    /* ── Carrusel de usuarios ── */
+    .carousel-section {
+      background: var(--white);
+      border-bottom: 2px solid #dde8f5;
+      padding: 12px 0 10px;
     }
-    thead th.th-partido { min-width:82px; max-width:100px; font-size:.72rem; line-height:1.5; }
-
-    .th-resultado { color:var(--gold); font-size:.8rem; font-weight:900; }
-    .th-flags { font-size:.75rem; font-weight:700; white-space:nowrap; }
-    .th-fecha { font-size:.62rem; opacity:.75; }
-
-    /* filas */
-    tbody tr:nth-child(even) td { background:#f0f7ff; }
-    tbody tr:hover td { background:#dbeeff !important; }
-    tbody td {
-      padding:8px 7px; border-bottom:1px solid #dde8f5;
-      text-align:center; vertical-align:middle;
+    .carousel-wrap {
+      max-width: 900px; margin: 0 auto;
+      display: flex; align-items: center; gap: 6px; padding: 0 10px;
     }
-    tbody td.td-nombre {
-      text-align:left; font-weight:700; padding-left:14px;
-      position:sticky; left:0; z-index:1; background:inherit;
-      border-right:2px solid var(--azul);
+    .arrow-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1.5px solid var(--azul); background: var(--white);
+      color: var(--azul3); cursor: pointer; font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .15s;
     }
-    tbody tr:nth-child(even) td.td-nombre { background:#f0f7ff; }
-    tbody tr:hover td.td-nombre { background:#dbeeff !important; }
-    tbody td.td-nombre a { color:var(--azul3); text-decoration:none; font-weight:800; display:inline-flex; align-items:center; gap:7px; }
-    tbody td.td-nombre a:hover { text-decoration:underline; }
-    .av { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid var(--azul); flex-shrink:0; }
-    .av-init { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,var(--azul2),var(--azul3)); color:#fff; font-size:.75rem; font-weight:900; display:inline-flex; align-items:center; justify-content:center; border:2px solid var(--azul); flex-shrink:0; }
-
-    /* chips de predicción */
-    .chip {
-      display:inline-flex; flex-direction:column; align-items:center;
-      border-radius:6px; padding:3px 7px; font-weight:800; font-size:.82rem;
-      line-height:1.2; min-width:36px;
+    .arrow-btn:hover { background: var(--azul2); color: #fff; border-color: var(--azul2); }
+    .carousel-track {
+      display: flex; gap: 6px; overflow-x: auto; scroll-behavior: smooth; flex: 1;
     }
-    .chip.p3  { background:#d4edda; color:#155724; }
-    .chip.p1  { background:#fff3cd; color:#856404; }
-    .chip.p0  { background:#f8d7da; color:#721c24; }
-    .chip.pnd { background:#e8f0fb; color:#4a7ab5; font-weight:600; }
-    .chip-pts { font-size:.6rem; font-weight:900; margin-top:1px; }
+    .carousel-track::-webkit-scrollbar { display: none; }
+    .u-pill {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer; padding: 6px 8px; border-radius: 10px; flex-shrink: 0;
+      border: 2px solid transparent; min-width: 68px; transition: all .18s;
+    }
+    .u-pill:hover { background: var(--light); border-color: var(--azul); }
+    .u-pill.active { background: #dbeeff; border-color: var(--azul2); }
+    .u-av {
+      width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+      border: 3px solid #dde8f5;
+    }
+    .u-pill.active .u-av { border-color: var(--azul2); }
+    .u-init {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul2), var(--azul3));
+      color: #fff; font-size: 1.2rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      border: 3px solid #dde8f5;
+    }
+    .u-pill.active .u-init { border-color: var(--azul2); }
+    .u-nombre {
+      font-size: .7rem; font-weight: 700; color: var(--gray);
+      max-width: 68px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      text-align: center;
+    }
+    .u-pill.active .u-nombre { color: var(--azul3); }
 
-    .no-pred { color:#c0cfe8; font-size:.75rem; }
+    /* ── Barra de fechas ── */
+    .fechas-section {
+      background: #f5f8fd; border-bottom: 1px solid #dde8f5;
+      padding: 10px 0; overflow-x: auto;
+    }
+    .fechas-inner {
+      display: flex; align-items: flex-end; gap: 4px;
+      max-width: 900px; margin: 0 auto; padding: 0 12px;
+      min-width: max-content;
+    }
+    .all-pill {
+      background: var(--azul3); color: #fff; border: none; border-radius: 20px;
+      padding: 7px 16px; font-size: .8rem; font-weight: 700; cursor: pointer;
+      white-space: nowrap; transition: background .15s; flex-shrink: 0;
+      align-self: center; margin-right: 8px;
+    }
+    .all-pill.active, .all-pill:hover { background: var(--azul2); }
+    .mes-group { display: flex; flex-direction: column; align-items: flex-start; }
+    .mes-label {
+      font-size: .6rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--gray); padding: 0 6px 4px;
+    }
+    .f-pills { display: flex; gap: 3px; }
+    .f-pill {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 5px 6px; border-radius: 18px; cursor: pointer;
+      border: 1.5px solid transparent; background: transparent;
+      min-width: 40px; transition: all .12s;
+    }
+    .f-pill:hover { background: #dbeeff; border-color: var(--azul); }
+    .f-pill.active { background: var(--azul2); border-color: var(--azul2); }
+    .f-dia { font-size: .6rem; font-weight: 600; color: var(--gray); }
+    .f-num { font-size: .88rem; font-weight: 800; color: var(--azul3); }
+    .f-pill.active .f-dia,
+    .f-pill.active .f-num { color: #fff; }
 
-    .empty { text-align:center; padding:48px 20px; color:var(--gray); }
-    .leyenda { display:flex; gap:12px; flex-wrap:wrap; padding:4px 16px 10px;
-               font-size:.75rem; align-items:center; color:var(--gray); }
-    .leyenda span { display:inline-flex; align-items:center; gap:5px; }
+    /* ── Grid de cards ── */
+    .grid-section { max-width: 900px; margin: 0 auto; padding: 18px 14px 48px; }
+    .sel-label { font-size: .82rem; color: var(--gray); margin-bottom: 14px; }
+    .sel-label strong { color: var(--azul3); }
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    }
+    @media (max-width: 680px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 440px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--white); border-radius: 12px;
+      box-shadow: 0 1px 8px rgba(45,111,160,.1); border: 1px solid #dde8f5;
+      padding: 12px 10px 10px; display: flex; flex-direction: column; gap: 5px;
+    }
+    .c-fase {
+      text-align: center; font-size: .58rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--gray);
+    }
+    .c-teams {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 4px;
+    }
+    .c-eq { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .c-eq img { border-radius: 2px; display: block; }
+    .c-sig { font-size: .7rem; font-weight: 900; color: var(--azul3); }
+    .c-score { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .s-big { font-size: 1.35rem; font-weight: 900; color: var(--azul3); letter-spacing: .04em; line-height: 1; }
+    .s-real { font-size: .62rem; color: var(--gray); }
+    .pts-b { font-size: .62rem; font-weight: 800; border-radius: 4px; padding: 1px 6px; }
+    .p3 { background: #d4edda; color: #155724; }
+    .p1 { background: #fff3cd; color: #856404; }
+    .p0 { background: #f8d7da; color: #721c24; }
+    .pnd { background: #e9ecef; color: #555; }
+    .no-pred { color: #b0c4de; font-size: 1.2rem; font-weight: 700; }
+    .c-fecha { text-align: center; font-size: .65rem; color: var(--gray);
+      border-top: 1px solid var(--light); padding-top: 6px; margin-top: 2px; }
+    .empty-msg { grid-column: 1 / -1; text-align: center; padding: 40px 20px;
+      color: var(--gray); font-size: .92rem; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
+    .empty-state p:first-child { font-size: 2.5rem; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>👥 Todos los pronósticos</h1>
-  <p>Prode Mundial 2026</p>
+  <div class="header-inner">
+    <div class="header-logo"><img src="/static/Logo_gipa.png" alt="GiPA"></div>
+    <div class="header-titulo">
+      <h1>👥 Todos los <span>pronósticos</span></h1>
+      <p>Prode GiPA Argentina Mundial 2026</p>
+    </div>
+    <img class="header-messi" src="/static/messi.png" alt="Messi"
+         onerror="this.style.display='none'">
+  </div>
   <div class="header-links">
     <a href="/">🏠 Inicio</a>
     <a href="/tabla">🏆 Tabla</a>
@@ -102,118 +182,188 @@
   </div>
 </div>
 
-{% if partidos and nombres %}
+{% if nombres %}
 
-{% set fases_orden = [
-    'Jornada 1 – Grupos','Jornada 2 – Grupos','Jornada 3 – Grupos',
-    'Dieciseisavos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'
-] %}
-{% set todas_fases = [] %}
-{% for p in partidos %}
-  {% set lbl = lote_label(p) %}
-  {% if lbl not in todas_fases %}{% set _ = todas_fases.append(lbl) %}{% endif %}
-{% endfor %}
-
-<div class="filtros">
-  <button class="filtro-btn active" onclick="filtrar(this,'')">Todos</button>
-  {% for fase in fases_orden %}{% if fase in todas_fases %}
-  <button class="filtro-btn" onclick="filtrar(this,'{{ fase }}')">{{ fase }}</button>
-  {% endif %}{% endfor %}
-  <span style="margin-left:auto;font-size:.82rem;color:var(--gray);align-self:center;">
-    {% if ver_todos %}
-      Mostrando todos los partidos —
-      <a href="/todos" style="color:var(--green);font-weight:700;">Ver solo hasta hoy</a>
-    {% else %}
-      Mostrando partidos hasta hoy ({{ partidos|length }} de {{ total_partidos }}) —
-      <a href="/todos?todos=1" style="color:var(--green);font-weight:700;">Ver todos</a>
-    {% endif %}
-  </span>
-</div>
-
-<div class="leyenda">
-  <strong>Referencias:</strong>
-  <span><span class="chip p3">2–1</span> Exacto (3pts)</span>
-  <span><span class="chip p1">2–1</span> Resultado (1pt)</span>
-  <span><span class="chip p0">2–1</span> Error (0pts)</span>
-  <span><span class="chip pnd">2–1</span> Sin resultado</span>
-</div>
-
-<div class="wrap">
-<table id="tabla-todos">
-  <thead>
-    <tr>
-      <th class="th-nombre">Participante</th>
-      {% for p in partidos %}
-      <th class="th-partido" data-fase="{{ lote_label(p) }}"
-          title="{{ p.equipo_local }} vs {{ p.equipo_visit }}">
-        <div class="th-flags">
-          {{ bandera_img(p.equipo_local, 18) | safe }} {{ siglas.get(p.equipo_local, p.equipo_local[:3]) }}
-          &nbsp;vs&nbsp;
-          {{ bandera_img(p.equipo_visit, 18) | safe }} {{ siglas.get(p.equipo_visit, p.equipo_visit[:3]) }}
-        </div>
-        {% if p.goles_local is not none and p.goles_visit is not none %}
-        <div class="th-resultado">{{ p.goles_local }}–{{ p.goles_visit }}</div>
-        {% endif %}
-        {% if p.fecha %}
-        <div class="th-fecha">{{ p.fecha.split(' ')[0] }}</div>
-        {% endif %}
-      </th>
-      {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-    {% for nombre in nombres %}
-    <tr>
-      <td class="td-nombre">
-        <a href="/mis-pronosticos/{{ nombre }}">
-          {% if avatares.get(nombre) %}
-            <img class="av" src="{{ avatares[nombre] }}" alt="{{ nombre }}">
-          {% else %}
-            <span class="av-init">{{ nombre[0].upper() }}</span>
-          {% endif %}
-          {{ nombre }}
-        </a>
-      </td>
-      {% for p in partidos %}
-      <td data-fase="{{ lote_label(p) }}">
-        {% if p.id in pronosticos[nombre] %}
-          {% set pr = pronosticos[nombre][p.id] %}
-          {% if pr.puntos is not none %}
-            {% set cls = 'p3' if pr.puntos==3 else ('p1' if pr.puntos==1 else 'p0') %}
-            {% set pts = pr.puntos %}
-            <span class="chip {{ cls }}">
-              {{ pr.goles_local }}–{{ pr.goles_visit }}
-              <span class="chip-pts">{{ pts }}pts</span>
-            </span>
-          {% else %}
-            <span class="chip pnd">{{ pr.goles_local }}–{{ pr.goles_visit }}</span>
-          {% endif %}
+<!-- ── Carrusel de usuarios ── -->
+<div class="carousel-section">
+  <div class="carousel-wrap">
+    <button class="arrow-btn" onclick="scrollCarousel(-1)">‹</button>
+    <div class="carousel-track" id="ctrack">
+      {% for nombre in nombres %}
+      <div class="u-pill{% if loop.first %} active{% endif %}"
+           onclick="selectUser(this,'{{ nombre }}')">
+        {% if avatares.get(nombre) %}
+          <img class="u-av" src="{{ avatares[nombre] }}" alt="{{ nombre }}">
         {% else %}
-          <span class="no-pred">–</span>
+          <div class="u-init">{{ nombre[0].upper() }}</div>
         {% endif %}
-      </td>
+        <span class="u-nombre">{{ nombre }}</span>
+      </div>
       {% endfor %}
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </div>
+    <button class="arrow-btn" onclick="scrollCarousel(1)">›</button>
+  </div>
+</div>
+
+<!-- ── Barra de fechas ── -->
+<div class="fechas-section">
+  <div class="fechas-inner" id="fecha-bar"></div>
+</div>
+
+<!-- ── Grid de cards ── -->
+<div class="grid-section">
+  <p class="sel-label">Pronósticos de <strong id="sel-nombre">{{ nombres[0] }}</strong></p>
+  <div class="cards-grid" id="cards-grid"></div>
 </div>
 
 {% else %}
-<div class="empty">
-  <p style="font-size:2rem">📋</p>
+<div class="empty-state">
+  <p>📋</p>
   <p>Todavía no hay pronósticos cargados.</p>
 </div>
 {% endif %}
 
 <script>
-function filtrar(btn, fase) {
-  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('[data-fase]').forEach(el => {
-    el.style.display = (!fase || el.dataset.fase === fase) ? '' : 'none';
-  });
+const SIGLAS = {{ siglas | tojson }};
+const FLAG   = {{ banderas | tojson }};
+const PARS   = {{ partidos_json | tojson }};
+const PRONS  = {{ pronosticos | tojson }};
+const NOMBRES = {{ nombres | tojson }};
+
+let curUser  = NOMBRES.length ? NOMBRES[0] : '';
+let curFecha = 'all';
+
+function flagImg(nombre, size) {
+  const c = FLAG[nombre];
+  if (!c) return `<span style="font-size:${Math.round(size*.6)}px;vertical-align:middle;">⚽</span>`;
+  return `<img src="https://flagcdn.com/w40/${c}.png" width="${size}"
+          height="${Math.round(size*0.67)}" alt="${nombre}"
+          style="border-radius:2px;vertical-align:middle;">`;
 }
+
+function parseFecha(f) {
+  if (!f) return null;
+  const m = f.match(/^(\d{2})\/(\d{2})/);
+  return m ? { key: m[0], d: +m[1], mes: +m[2] } : null;
+}
+
+const DIAS_ES  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MESES_ES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function diaNombre(d, mes) {
+  return DIAS_ES[new Date(2026, mes - 1, d).getDay()];
+}
+
+/* Fechas únicas ordenadas */
+const fechaMap = {};
+PARS.forEach(p => {
+  const f = parseFecha(p.fecha);
+  if (f && !fechaMap[f.key]) fechaMap[f.key] = f;
+});
+const fechas = Object.values(fechaMap).sort((a,b) => (a.mes*100+a.d) - (b.mes*100+b.d));
+
+/* Construir barra de fechas */
+function buildFechaBar() {
+  const bar = document.getElementById('fecha-bar');
+  let html = `<button class="all-pill${curFecha==='all'?' active':''}"
+    onclick="selFecha('all',this)">Todos</button>`;
+
+  let lastMes = null;
+  fechas.forEach(f => {
+    if (f.mes !== lastMes) {
+      if (lastMes !== null) html += '</div></div>';
+      html += `<div class="mes-group"><div class="mes-label">${MESES_ES[f.mes]}</div><div class="f-pills">`;
+      lastMes = f.mes;
+    }
+    html += `<button class="f-pill${curFecha===f.key?' active':''}"
+      onclick="selFecha('${f.key}',this)">
+      <span class="f-dia">${diaNombre(f.d,f.mes)}</span>
+      <span class="f-num">${f.d}</span>
+    </button>`;
+  });
+  if (lastMes !== null) html += '</div></div>';
+  bar.innerHTML = html;
+}
+
+/* Renderizar cards */
+function renderCards() {
+  document.getElementById('sel-nombre').textContent = curUser;
+  const grid = document.getElementById('cards-grid');
+
+  const filtered = PARS.filter(p => {
+    if (curFecha === 'all') return true;
+    const f = parseFecha(p.fecha);
+    return f && f.key === curFecha;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-msg">No hay partidos para esta fecha.</div>';
+    return;
+  }
+
+  const userProns = PRONS[curUser] || {};
+
+  grid.innerHTML = filtered.map(p => {
+    const pred = userProns[String(p.id)];
+    let scoreHtml, ptsHtml = '';
+
+    if (pred !== undefined) {
+      scoreHtml = `<span class="s-big">${pred.goles_local} – ${pred.goles_visit}</span>`;
+      if (pred.puntos !== null && pred.puntos !== undefined) {
+        const cls = pred.puntos === 3 ? 'p3' : (pred.puntos === 1 ? 'p1' : 'p0');
+        ptsHtml = `<span class="pts-b ${cls}">${pred.puntos} pts</span>`;
+      } else {
+        ptsHtml = `<span class="pts-b pnd">pendiente</span>`;
+      }
+    } else {
+      scoreHtml = `<span class="no-pred">– –</span>`;
+    }
+
+    const realHtml = (p.goles_local !== null && p.goles_visit !== null)
+      ? `<div class="s-real">Real: ${p.goles_local}–${p.goles_visit}</div>` : '';
+
+    const sig_l = SIGLAS[p.equipo_local]  || p.equipo_local.substring(0,3).toUpperCase();
+    const sig_v = SIGLAS[p.equipo_visit] || p.equipo_visit.substring(0,3).toUpperCase();
+    const fechaShort = p.fecha ? p.fecha.split(' ')[0] : '';
+
+    return `<div class="card">
+      <div class="c-fase">${p.fase_label}</div>
+      <div class="c-teams">
+        <div class="c-eq">${flagImg(p.equipo_local,34)}<span class="c-sig">${sig_l}</span></div>
+        <div class="c-score">
+          ${scoreHtml}
+          ${realHtml}
+          ${ptsHtml}
+        </div>
+        <div class="c-eq">${flagImg(p.equipo_visit,34)}<span class="c-sig">${sig_v}</span></div>
+      </div>
+      ${fechaShort ? `<div class="c-fecha">📅 ${fechaShort}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function selFecha(key, btn) {
+  curFecha = key;
+  document.querySelectorAll('.f-pill, .all-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function selectUser(el, nombre) {
+  curUser = nombre;
+  document.querySelectorAll('.u-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderCards();
+}
+
+function scrollCarousel(dir) {
+  document.getElementById('ctrack').scrollBy({ left: dir * 220, behavior: 'smooth' });
+}
+
+/* Init */
+buildFechaBar();
+renderCards();
 </script>
 </body>
 </html>

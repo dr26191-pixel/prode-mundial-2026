@@ -397,28 +397,33 @@ def _fecha_ord(fecha_str):
 
 @app.route("/todos")
 def todos():
-    ver_todos = request.args.get("todos") == "1"
-    hoy  = datetime.now()
-    hoy_ord = hoy.month * 100 + hoy.day
+    try:
+        lote_row = fetchone(db_execute(
+            "SELECT COALESCE(MAX(numero), 99) AS m FROM lotes WHERE publicado=1"))
+        lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
+        ph = placeholder()
+        todos_partidos = fetchall(db_execute(
+            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
+    except Exception:
+        todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
 
-    todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    for p in todos_partidos:
+        p["fase_label"] = lote_label(p)
 
-    if ver_todos:
-        partidos = todos_partidos
-    else:
-        partidos = [p for p in todos_partidos if _fecha_ord(p.get("fecha") or "") <= hoy_ord]
-
-    nombres  = [r["nombre"] for r in fetchall(db_execute(
+    nombres = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
-    p = placeholder()
+    ph = placeholder()
     prons = {}
     for n in nombres:
-        prons[n] = {r["partido_id"]: r for r in fetchall(
-            db_execute(f"SELECT * FROM pronosticos WHERE nombre={p}", (n,)))}
+        prons[n] = {str(r["partido_id"]): {
+            "goles_local": r["goles_local"],
+            "goles_visit": r["goles_visit"],
+            "puntos": r["puntos"]
+        } for r in fetchall(db_execute(f"SELECT * FROM pronosticos WHERE nombre={ph}", (n,)))}
+
     return render_template("todos.html",
-                           partidos=partidos, nombres=nombres, pronosticos=prons,
-                           ver_todos=ver_todos, total_partidos=len(todos_partidos),
-                           avatares=_avatares())
+                           partidos_json=todos_partidos, nombres=nombres,
+                           pronosticos=prons, avatares=_avatares())
 
 # ── Admin ─────────────────────────────────────────────────────────
 
