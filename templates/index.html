@@ -242,12 +242,16 @@
       <input type="text" id="nombre" name="nombre" placeholder="Ej. Diego" required autocomplete="nickname">
     </div>
 
-    {% set fases = partidos | map(attribute='fase') | list | unique | list %}
-    {% for fase in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
-      {% set partidos_fase = partidos | selectattr('fase','equalto', fase) | list %}
-      {% if partidos_fase %}
-    <p class="section-title">{{ fase }}</p>
-    {% for p in partidos_fase %}
+    {% set ordered_labels = [
+        'Jornada 1 – Grupos','Jornada 2 – Grupos','Jornada 3 – Grupos',
+        'Dieciseisavos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'
+    ] %}
+    {% for label in ordered_labels %}
+      {% set partidos_label = [] %}
+      {% for p in partidos %}{% if lote_label(p) == label %}{% set _ = partidos_label.append(p) %}{% endif %}{% endfor %}
+      {% if partidos_label %}
+    <p class="section-title">{{ label }}</p>
+    {% for p in partidos_label %}
     <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
       <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>
       <div>
@@ -266,7 +270,7 @@
             </div>
           {% endif %}
         {% else %}
-          <div class="fase-tag">{{ p.fase }}</div>
+          <div class="fase-tag">{{ lote_label(p) }}</div>
           <div class="score-inputs">
             <div class="stepper">
               <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
@@ -286,50 +290,6 @@
       <div class="equipo visit">{{ bandera_img(p.equipo_visit, 28) | safe }} {{ p.equipo_visit }}</div>
     </div>
     {% endfor %}
-      {% endif %}
-    {% endfor %}
-
-    {# Partidos con fases que no están en la lista fija #}
-    {% for p in partidos %}
-      {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
-      {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
-    <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
-      <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>
-      <div>
-        {% if p.bloqueado %}
-          {% if p.goles_local is not none and p.goles_visit is not none %}
-            <div class="lock-badge">🔒 Terminado</div>
-            <div class="resultado-final">
-              <span class="score">{{ p.goles_local }}</span>
-              <span class="sep">–</span>
-              <span class="score">{{ p.goles_visit }}</span>
-            </div>
-          {% else %}
-            <div class="lock-badge">🔒 Cerrado</div>
-            <div class="resultado-final" style="opacity:.45">
-              <span class="score">?</span><span class="sep">–</span><span class="score">?</span>
-            </div>
-          {% endif %}
-        {% else %}
-          <div class="fase-tag">{{ p.fase }}</div>
-          <div class="score-inputs">
-            <div class="stepper">
-              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
-              <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
-            </div>
-            <span class="sep">–</span>
-            <div class="stepper">
-              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
-              <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
-              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
-            </div>
-          </div>
-        {% endif %}
-        {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
-      </div>
-      <div class="equipo visit">{{ bandera_img(p.equipo_visit, 28) | safe }} {{ p.equipo_visit }}</div>
-    </div>
       {% endif %}
     {% endfor %}
 
