@@ -100,10 +100,12 @@
       align-items: center;
       gap: 12px;
     }
-    .partido .equipo { font-weight: 700; font-size: 0.92rem; display:flex; align-items:center; gap:5px; }
-    .partido .equipo.local { justify-content: flex-end; }
-    .partido .equipo.visit { justify-content: flex-start; }
-    .partido .equipo img { flex-shrink:0; }
+    .partido .equipo {
+      font-weight: 700; font-size: 0.82rem;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px; text-align: center; line-height: 1.2;
+    }
+    .partido .equipo img { display:block; }
     .partido .fecha { font-size: 0.75rem; color: var(--gray); text-align: center; margin-top: 2px; }
     .partido .fase-tag {
       font-size: 0.68rem; background: #dbeeff; color: var(--azul3);
@@ -247,7 +249,7 @@
     <p class="section-title">{{ fase }}</p>
     {% for p in partidos_fase %}
     <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
-      <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
+      <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>
       <div>
         {% if p.bloqueado %}
           {% if p.goles_local is not none and p.goles_visit is not none %}
@@ -281,7 +283,7 @@
         {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
-      <div class="equipo visit">{{ p.equipo_visit }} {{ bandera_img(p.equipo_visit) | safe }}</div>
+      <div class="equipo visit">{{ bandera_img(p.equipo_visit, 28) | safe }} {{ p.equipo_visit }}</div>
     </div>
     {% endfor %}
       {% endif %}
@@ -292,7 +294,7 @@
       {% if p.fase not in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
       {% if loop.first %}<p class="section-title">{{ p.fase }}</p>{% endif %}
     <div class="partido {{ 'terminado' if p.bloqueado else '' }}">
-      <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
+      <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>
       <div>
         {% if p.bloqueado %}
           {% if p.goles_local is not none and p.goles_visit is not none %}
@@ -326,7 +328,7 @@
         {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
       </div>
-      <div class="equipo visit">{{ p.equipo_visit }} {{ bandera_img(p.equipo_visit) | safe }}</div>
+      <div class="equipo visit">{{ bandera_img(p.equipo_visit, 28) | safe }} {{ p.equipo_visit }}</div>
     </div>
       {% endif %}
     {% endfor %}

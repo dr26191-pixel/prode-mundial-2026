@@ -24,9 +24,12 @@
       padding:12px 16px; margin-bottom:8px;
       display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px;
     }
-    .equipo { font-weight:700; font-size:.88rem; display:flex; align-items:center; gap:5px; }
-    .equipo.local { justify-content:flex-end; text-align:right; }
-    .equipo img { flex-shrink:0; }
+    .equipo {
+      font-weight:700; font-size:.82rem;
+      display:flex; flex-direction:column; align-items:center;
+      gap:4px; text-align:center; line-height:1.2;
+    }
+    .equipo img { display:block; }
     .centro { text-align:center; }
     .score { font-size:1.3rem; font-weight:900; color:var(--green); letter-spacing:.05em; }
     .real  { font-size:.75rem; color:var(--gray); margin-top:3px; }
@@ -93,7 +96,7 @@
   <p class="section-title">{{ fase }}</p>
     {% for p in pf %}
   <div class="partido">
-    <div class="equipo local">{{ bandera_img(p.equipo_local) | safe }} {{ p.equipo_local }}</div>
+    <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>
     <div class="centro">
       {% if p.id in pronosticos %}
         {% set pr = pronosticos[p.id] %}
@@ -112,7 +115,7 @@
       {% endif %}
       {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
     </div>
-    <div class="equipo visit">{{ p.equipo_visit }} {{ bandera_img(p.equipo_visit) | safe }}</div>
+    <div class="equipo visit">{{ bandera_img(p.equipo_visit, 28) | safe }} {{ p.equipo_visit }}</div>
   </div>
     {% endfor %}
     {% endif %}
