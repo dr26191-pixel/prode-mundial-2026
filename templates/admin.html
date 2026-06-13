@@ -205,7 +205,7 @@
           <div class="teams">{{ bandera_img(p.equipo_local,18)|safe }} {{ p.equipo_local }}
             <span style="color:var(--gray);font-weight:400"> vs </span>
             {{ p.equipo_visit }} {{ bandera_img(p.equipo_visit,18)|safe }}</div>
-          <div class="meta">{{ p.fase }}{% if p.fecha %} · {{ p.fecha }}{% endif %}</div>
+          <div class="meta">{{ lote_label(p) }}{% if p.fecha %} · {{ p.fecha }}{% endif %}</div>
           {% if p.goles_local is not none and p.goles_visit is not none %}
           <div class="resultado">✔ {{ p.goles_local }} – {{ p.goles_visit }}</div>
           {% endif %}

@@ -90,10 +90,15 @@
   </div>
   {% endif %}
 
-  {% for fase in ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
-    {% set pf = partidos | selectattr('fase','equalto',fase) | list %}
+  {% set ordered_labels = [
+      'Jornada 1 – Grupos','Jornada 2 – Grupos','Jornada 3 – Grupos',
+      'Dieciseisavos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'
+  ] %}
+  {% for label in ordered_labels %}
+    {% set pf = [] %}
+    {% for p in partidos %}{% if lote_label(p) == label %}{% set _ = pf.append(p) %}{% endif %}{% endfor %}
     {% if pf %}
-  <p class="section-title">{{ fase }}</p>
+  <p class="section-title">{{ label }}</p>
     {% for p in pf %}
   <div class="partido">
     <div class="equipo local">{{ bandera_img(p.equipo_local, 28) | safe }} {{ p.equipo_local }}</div>

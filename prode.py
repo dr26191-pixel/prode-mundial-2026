@@ -52,6 +52,15 @@ SIGLAS = {
 }
 app.jinja_env.globals["siglas"] = SIGLAS
 
+def lote_label(partido):
+    """Devuelve etiqueta de fase legible: 'Jornada 1 – Grupos' para grupos, fase tal cual para el resto."""
+    fase = (partido.get("fase") or "Grupos").strip()
+    if fase == "Grupos":
+        lote = partido.get("lote") or 1
+        return f"Jornada {lote} – Grupos"
+    return fase
+app.jinja_env.globals["lote_label"] = lote_label
+
 # Traduce nombres de football-data.org (inglés) → nombres usados en la DB (español)
 NOMBRES_API = {
     "Mexico":"México", "South Africa":"Sudáfrica", "South Korea":"Corea del Sur",

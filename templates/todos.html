@@ -104,10 +104,14 @@
 
 {% if partidos and nombres %}
 
-{% set fases_orden = ['Grupos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'] %}
+{% set fases_orden = [
+    'Jornada 1 – Grupos','Jornada 2 – Grupos','Jornada 3 – Grupos',
+    'Dieciseisavos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'
+] %}
 {% set todas_fases = [] %}
 {% for p in partidos %}
-  {% if p.fase not in todas_fases %}{% set _ = todas_fases.append(p.fase) %}{% endif %}
+  {% set lbl = lote_label(p) %}
+  {% if lbl not in todas_fases %}{% set _ = todas_fases.append(lbl) %}{% endif %}
 {% endfor %}
 
 <div class="filtros">
@@ -140,7 +144,7 @@
     <tr>
       <th class="th-nombre">Participante</th>
       {% for p in partidos %}
-      <th class="th-partido" data-fase="{{ p.fase }}"
+      <th class="th-partido" data-fase="{{ lote_label(p) }}"
           title="{{ p.equipo_local }} vs {{ p.equipo_visit }}">
         <div class="th-flags">
           {{ bandera_img(p.equipo_local, 18) | safe }} {{ siglas.get(p.equipo_local, p.equipo_local[:3]) }}
@@ -171,7 +175,7 @@
         </a>
       </td>
       {% for p in partidos %}
-      <td data-fase="{{ p.fase }}">
+      <td data-fase="{{ lote_label(p) }}">
         {% if p.id in pronosticos[nombre] %}
           {% set pr = pronosticos[nombre][p.id] %}
           {% if pr.puntos is not none %}
