@@ -203,6 +203,18 @@ def init_db():
                 avatar TEXT
             )
         """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS lotes (
+                numero    INTEGER PRIMARY KEY,
+                nombre    TEXT    NOT NULL,
+                fechas    TEXT,
+                publicado INTEGER DEFAULT 0
+            )
+        """)
+        # Agregar columna lote si la tabla ya existe sin ella
+        cur.execute(
+            "ALTER TABLE partidos ADD COLUMN IF NOT EXISTS lote INTEGER DEFAULT 1"
+        )
         conn.commit()
         conn.close()
     else:
@@ -216,7 +228,8 @@ def init_db():
                 equipo_visit   TEXT    NOT NULL,
                 fecha          TEXT,
                 goles_local    INTEGER,
-                goles_visit    INTEGER
+                goles_visit    INTEGER,
+                lote           INTEGER DEFAULT 1
             );
             CREATE TABLE IF NOT EXISTS pronosticos (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -232,7 +245,19 @@ def init_db():
                 nombre TEXT PRIMARY KEY,
                 avatar TEXT
             );
+            CREATE TABLE IF NOT EXISTS lotes (
+                numero    INTEGER PRIMARY KEY,
+                nombre    TEXT    NOT NULL,
+                fechas    TEXT,
+                publicado INTEGER DEFAULT 0
+            );
         """)
+        # Agregar columna lote a tabla existente si no tiene la columna
+        try:
+            conn.execute("ALTER TABLE partidos ADD COLUMN lote INTEGER DEFAULT 1")
+            conn.commit()
+        except Exception:
+            pass  # ya existe
         conn.commit()
         conn.close()
 
@@ -248,9 +273,17 @@ def calcular_puntos(pl, pv, rl, rv):
 
 @app.route("/")
 def index():
-    partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
-    for p in partidos:
-        p["bloqueado"] = partido_bloqueado(p)
+    try:
+        lote_row = fetchone(db_execute(
+            "SELECT COALESCE(MAX(numero), 99) AS m FROM lotes WHERE publicado=1"))
+        lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
+        ph = placeholder()
+        partidos = fetchall(db_execute(
+            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
+    except Exception:
+        partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    for partido in partidos:
+        partido["bloqueado"] = partido_bloqueado(partido)
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE)
 
@@ -456,7 +489,12 @@ def admin():
     partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     participantes = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
-    return render_template("admin.html", partidos=partidos, participantes=participantes)
+    try:
+        lotes = fetchall(db_execute("SELECT * FROM lotes ORDER BY numero"))
+    except Exception:
+        lotes = []
+    return render_template("admin.html", partidos=partidos,
+                           participantes=participantes, lotes=lotes)
 
 @app.route("/admin/partido", methods=["POST"])
 def admin_partido():
@@ -492,6 +530,28 @@ def borrar_partido(pid):
     db_execute(f"DELETE FROM pronosticos WHERE partido_id={p}", (pid,))
     db_execute(f"DELETE FROM partidos WHERE id={p}", (pid,))
     db_commit()
+    return redirect(url_for("admin"))
+
+@app.route("/admin/publicar-lote/<int:n>", methods=["POST"])
+def publicar_lote(n):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    p = placeholder()
+    db_execute(f"UPDATE lotes SET publicado=1 WHERE numero={p}", (n,))
+    db_commit()
+    lote_row = fetchone(db_execute(f"SELECT nombre FROM lotes WHERE numero={p}", (n,)))
+    nombre_lote = lote_row["nombre"] if lote_row else f"Lote {n}"
+    flash(f"✅ Publicado: {nombre_lote}")
+    return redirect(url_for("admin"))
+
+@app.route("/admin/despublicar-lote/<int:n>", methods=["POST"])
+def despublicar_lote(n):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    p = placeholder()
+    db_execute(f"UPDATE lotes SET publicado=0 WHERE numero={p}", (n,))
+    db_commit()
+    lote_row = fetchone(db_execute(f"SELECT nombre FROM lotes WHERE numero={p}", (n,)))
+    nombre_lote = lote_row["nombre"] if lote_row else f"Lote {n}"
+    flash(f"🔒 Ocultado: {nombre_lote}")
     return redirect(url_for("admin"))
 
 @app.route("/admin/logout")

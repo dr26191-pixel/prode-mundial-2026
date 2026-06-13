@@ -149,6 +149,52 @@
     <a href="/admin/sync-resultados" class="btn btn-azul">🔄 Sincronizar resultados reales</a>
   </div>
 
+  <!-- ── Lotes / publicar etapas ── -->
+  <div class="section">
+    <h2>📅 Publicar partidos por etapa</h2>
+    <p style="font-size:.84rem;color:var(--gray);margin-bottom:14px;">
+      Controlá qué partidos ven los participantes en el formulario de pronósticos.
+      Publicá un lote a la vez para no mostrar todos de golpe.
+    </p>
+    {% if lotes %}
+      {% for lote in lotes %}
+      <div class="partido-row" style="padding:10px 14px;gap:10px;">
+        <div class="partido-info" style="min-width:0;flex:1;">
+          <div class="teams" style="font-size:.9rem;">
+            <span style="color:var(--gray);font-weight:600;font-size:.8rem;">LOTE {{ lote.numero }}</span>
+            &nbsp; {{ lote.nombre }}
+          </div>
+          {% if lote.fechas %}
+          <div class="meta">📅 {{ lote.fechas }}</div>
+          {% endif %}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          {% if lote.publicado %}
+            <span style="color:#27ae60;font-weight:800;font-size:.83rem;white-space:nowrap;">✅ Publicado</span>
+            <form action="/admin/despublicar-lote/{{ lote.numero }}" method="POST">
+              <button class="btn btn-gray btn-sm" type="submit"
+                      onclick="return confirm('¿Ocultar «{{ lote.nombre }}»?')">🙈 Ocultar</button>
+            </form>
+          {% else %}
+            <span style="color:var(--gray);font-size:.83rem;white-space:nowrap;">🔒 Oculto</span>
+            <form action="/admin/publicar-lote/{{ lote.numero }}" method="POST">
+              <button class="btn btn-azul btn-sm" type="submit">📢 Publicar</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      <p style="font-size:.78rem;color:var(--gray);margin-top:10px;">
+        💡 Lotes 4-8 (eliminatorias) los agregás manualmente desde «Agregar partido» cuando se definan los clasificados.
+      </p>
+    {% else %}
+      <p class="no-data">
+        Lotes no inicializados. Ejecutá <code>python init_lotes.py</code> en Render Shell
+        y recargá esta página.
+      </p>
+    {% endif %}
+  </div>
+
   <!-- ── Lista de partidos ── -->
   <div class="section">
     <h2>⚽ Partidos cargados</h2>
