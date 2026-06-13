@@ -113,16 +113,26 @@
     .score-inputs {
       display: flex; align-items: center; gap: 6px; justify-content: center;
     }
-    .score-inputs input {
-      width: 48px; height: 44px; text-align: center;
-      border: 1.5px solid #d0d0d0; border-radius: 8px;
-      font-size: 1.2rem; font-weight: 700; font-family: inherit;
-      -moz-appearance: textfield;
-    }
-    .score-inputs input::-webkit-outer-spin-button,
-    .score-inputs input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .score-inputs input:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(74,144,217,.2); }
     .score-inputs .sep { font-size: 1.2rem; font-weight: 900; color: var(--gray); }
+
+    /* stepper +/- */
+    .stepper { display:inline-flex; align-items:center; }
+    .stepper-btn {
+      width:36px; height:44px; border:1.5px solid #b8d4f0; background:#e8f3fc;
+      font-size:1.3rem; font-weight:900; cursor:pointer; color:var(--azul3);
+      line-height:1; padding:0; user-select:none;
+    }
+    .stepper-btn:active { background:var(--azul2); color:#fff; }
+    .stepper-btn.minus { border-radius:8px 0 0 8px; border-right:0; }
+    .stepper-btn.plus  { border-radius:0 8px 8px 0; border-left:0; }
+    .stepper input {
+      width:46px; height:44px; text-align:center; border:1.5px solid #b8d4f0;
+      font-size:1.2rem; font-weight:700; font-family:inherit;
+      -moz-appearance:textfield; background:#fff; padding:0;
+    }
+    .stepper input::-webkit-outer-spin-button,
+    .stepper input::-webkit-inner-spin-button { -webkit-appearance:none; }
+    .stepper input:focus { outline:none; border-color:var(--azul2); position:relative; z-index:1; }
 
     /* ── Partido terminado (bloqueado) ── */
     .partido.terminado {
@@ -157,6 +167,17 @@
 
     /* ── No partidos ── */
     .empty { text-align: center; color: var(--gray); padding: 40px 0; font-size: 1rem; }
+
+    /* ── Mobile ── */
+    @media (max-width: 500px) {
+      .partido { grid-template-columns: 1fr auto 1fr; gap: 6px; padding: 10px 10px; }
+      .partido .equipo { font-size: .8rem; }
+      .stepper-btn { width: 34px; height: 42px; font-size: 1.2rem; }
+      .stepper input { width: 40px; height: 42px; font-size: 1.1rem; }
+      .header-titulo h1 { font-size: 1.1rem; }
+      .header-logo img { height: 60px; }
+      .header-messi { height: 100px !important; }
+    }
 
     /* ── Pronósticos cerrados ── */
     .cerrado-banner {
@@ -244,9 +265,17 @@
         {% else %}
           <div class="fase-tag">{{ p.fase }}</div>
           <div class="score-inputs">
-            <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
+              <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
+            </div>
             <span class="sep">–</span>
-            <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
+              <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
+            </div>
           </div>
         {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
@@ -281,9 +310,17 @@
         {% else %}
           <div class="fase-tag">{{ p.fase }}</div>
           <div class="score-inputs">
-            <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
+              <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
+            </div>
             <span class="sep">–</span>
-            <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+            <div class="stepper">
+              <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
+              <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
+            </div>
           </div>
         {% endif %}
         {% if p.fecha %}<div class="fecha">{{ p.fecha }}</div>{% endif %}
@@ -304,5 +341,12 @@
   </div>
   {% endif %}
 </div>
+<script>
+function step(btn, delta) {
+  const input = btn.parentElement.querySelector('input');
+  const val = parseInt(input.value) || 0;
+  input.value = Math.max(0, val + delta);
+}
+</script>
 </body>
 </html>
