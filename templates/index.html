@@ -237,9 +237,25 @@
   {% if partidos and abierto %}
   <form action="/pronostico" method="POST">
 
+    {% if nombre_param %}
+    <div style="background:#dbeeff;border:1.5px solid var(--azul2);border-radius:10px;
+                padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:1.3rem;">✏️</span>
+      <div>
+        <div style="font-weight:800;color:var(--azul3);font-size:.95rem;">
+          Actualizando pronósticos de: {{ nombre_param }}
+        </div>
+        <div style="font-size:.8rem;color:var(--gray);margin-top:2px;">
+          Tus predicciones ya guardadas aparecen pre-cargadas. Solo modificá lo que falta y guardá.
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="nombre-card">
       <label for="nombre">Tu nombre o alias</label>
-      <input type="text" id="nombre" name="nombre" placeholder="Ej. Diego" required autocomplete="nickname">
+      <input type="text" id="nombre" name="nombre" placeholder="Ej. Diego" required
+             autocomplete="nickname" value="{{ nombre_param }}">
     </div>
 
     {% set ordered_labels = [
@@ -270,17 +286,22 @@
             </div>
           {% endif %}
         {% else %}
-          <div class="fase-tag">{{ lote_label(p) }}</div>
+          {% set prev = previos.get(p.id) %}
+          <div class="fase-tag">
+            {{ lote_label(p) }}{% if prev %} <span style="color:#27ae60;">✓</span>{% endif %}
+          </div>
           <div class="score-inputs">
             <div class="stepper">
               <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
-              <input type="number" name="local_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <input type="number" name="local_{{ p.id }}" min="0" max="99" inputmode="numeric"
+                     value="{{ prev.goles_local if prev else 0 }}">
               <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
             </div>
             <span class="sep">–</span>
             <div class="stepper">
               <button type="button" class="stepper-btn minus" onclick="step(this,-1)">−</button>
-              <input type="number" name="visit_{{ p.id }}" min="0" max="99" value="0" inputmode="numeric">
+              <input type="number" name="visit_{{ p.id }}" min="0" max="99" inputmode="numeric"
+                     value="{{ prev.goles_visit if prev else 0 }}">
               <button type="button" class="stepper-btn plus" onclick="step(this,1)">+</button>
             </div>
           </div>

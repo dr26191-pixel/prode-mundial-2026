@@ -293,8 +293,20 @@ def index():
         partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     for partido in partidos:
         partido["bloqueado"] = partido_bloqueado(partido)
+
+    # Pre-cargar predicciones existentes si viene ?nombre=X en la URL
+    nombre_param = request.args.get("nombre", "").strip()
+    previos = {}
+    if nombre_param:
+        ph = placeholder()
+        rows = fetchall(db_execute(
+            f"SELECT partido_id, goles_local, goles_visit FROM pronosticos WHERE nombre={ph}",
+            (nombre_param,)))
+        previos = {r["partido_id"]: r for r in rows}
+
     return render_template("index.html", partidos=partidos,
-                           abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE)
+                           abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE,
+                           nombre_param=nombre_param, previos=previos)
 
 @app.route("/pronostico", methods=["POST"])
 def pronostico():
