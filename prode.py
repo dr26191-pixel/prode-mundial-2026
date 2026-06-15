@@ -304,12 +304,9 @@ def index():
             (nombre_param,)))
         previos = {r["partido_id"]: r for r in rows}
 
-    usuarios_existentes = [r["nombre"] for r in fetchall(db_execute(
-        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE,
-                           nombre_param=nombre_param, previos=previos,
-                           usuarios_existentes=usuarios_existentes)
+                           nombre_param=nombre_param, previos=previos)
 
 @app.route("/pronostico", methods=["POST"])
 def pronostico():
@@ -318,12 +315,7 @@ def pronostico():
         return redirect(url_for("index"))
     nombre = request.form.get("nombre", "").strip()
     if not nombre:
-        flash("Seleccioná tu nombre para guardar los pronósticos.")
-        return redirect(url_for("index"))
-    usuarios_validos = [r["nombre"] for r in fetchall(db_execute(
-        "SELECT DISTINCT nombre FROM pronosticos"))]
-    if usuarios_validos and nombre not in usuarios_validos:
-        flash("Nombre no reconocido. Seleccioná tu nombre de la lista.")
+        flash("Ingresá tu nombre para guardar los pronósticos.")
         return redirect(url_for("index"))
 
     p = placeholder()
@@ -458,13 +450,14 @@ def todos():
     except Exception:
         todos_completo = True
 
-    lote_visible_max = lote_max if todos_completo else lote_max - 1
+    # Partidos: siempre se muestran todos los del lote publicado
+    # Predicciones: solo visibles en lotes anteriores al actual mientras no completen
+    pred_visible_max = lote_max if todos_completo else lote_max - 1
 
     try:
         ph = placeholder()
         todos_partidos = fetchall(db_execute(
-            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id",
-            (lote_visible_max,)))
+            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
     except Exception:
         todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
 
@@ -485,7 +478,8 @@ def todos():
                            pronosticos=prons, avatares=_avatares(),
                            todos_completo=todos_completo,
                            lote_actual_nombre=lote_actual_nombre,
-                           faltantes=faltantes)
+                           faltantes=faltantes,
+                           pred_visible_max=pred_visible_max)
 
 # ── Admin ─────────────────────────────────────────────────────────
 

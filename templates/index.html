@@ -70,14 +70,11 @@
       margin-bottom: 24px;
     }
     .nombre-card label { font-weight: 700; font-size: 0.95rem; display: block; margin-bottom: 8px; }
-    .nombre-card select {
+    .nombre-card input {
       width: 100%; padding: 11px 14px; border: 1.5px solid #d0d0d0;
       border-radius: 8px; font-size: 16px; font-family: inherit;
-      background: #fff; color: var(--dark); appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A90D9' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 14px center; cursor: pointer;
     }
-    .nombre-card select:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(74,144,217,.2); }
+    .nombre-card input:focus { outline: none; border-color: var(--azul2); box-shadow: 0 0 0 3px rgba(74,144,217,.2); }
 
     /* ── Section title – sticky banner ── */
     .section-title {
@@ -256,13 +253,9 @@
     {% endif %}
 
     <div class="nombre-card">
-      <label for="nombre">Tu nombre</label>
-      <select id="nombre" name="nombre" required>
-        <option value="">— Elegí tu nombre —</option>
-        {% for u in usuarios_existentes %}
-        <option value="{{ u }}"{% if u == nombre_param %} selected{% endif %}>{{ u }}</option>
-        {% endfor %}
-      </select>
+      <label for="nombre">Tu nombre o alias</label>
+      <input type="text" id="nombre" name="nombre" placeholder="Ej. Diego" required
+             autocomplete="nickname" value="{{ nombre_param }}">
     </div>
 
     {% set ordered_labels = [

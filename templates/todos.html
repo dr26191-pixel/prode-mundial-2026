@@ -195,8 +195,8 @@
 <div class="locked-banner">
   <span class="lb-icon">🔒</span>
   <div>
-    <strong>Pronósticos de {{ lote_actual_nombre }} ocultos</strong>
-    Se mostrarán cuando todos completen sus predicciones.
+    <strong>Predicciones de {{ lote_actual_nombre }} ocultas</strong>
+    Las predicciones de este lote se revelan cuando todos completen.
     {% if faltantes %}Falta{{ 'n' if faltantes|length > 1 else '' }}: <strong>{{ faltantes | join(', ') }}</strong>{% endif %}
   </div>
 </div>
@@ -249,6 +249,7 @@ const FLAG   = {{ banderas | tojson }};
 const PARS   = {{ partidos_json | tojson }};
 const PRONS  = {{ pronosticos | tojson }};
 const NOMBRES = {{ nombres | tojson }};
+const PRED_VISIBLE_MAX = {{ pred_visible_max }};
 
 let curUser  = NOMBRES.length ? NOMBRES[0] : '';
 let curFecha = 'all';
@@ -326,9 +327,13 @@ function renderCards() {
 
   grid.innerHTML = filtered.map(p => {
     const pred = userProns[String(p.id)];
+    const predsVisible = (p.lote || 1) <= PRED_VISIBLE_MAX;
     let scoreHtml, ptsHtml = '';
 
-    if (pred !== undefined) {
+    if (!predsVisible) {
+      scoreHtml = `<span class="no-pred" title="Se revela cuando todos completen">🔒</span>`;
+      ptsHtml   = `<span class="pts-b pnd">pendiente</span>`;
+    } else if (pred !== undefined) {
       scoreHtml = `<span class="s-big">${pred.goles_local} – ${pred.goles_visit}</span>`;
       if (pred.puntos !== null && pred.puntos !== undefined) {
         const cls = pred.puntos === 3 ? 'p3' : (pred.puntos === 1 ? 'p1' : 'p0');
