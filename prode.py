@@ -438,33 +438,10 @@ def todos():
             "puntos": r["puntos"]
         } for r in fetchall(db_execute(f"SELECT * FROM pronosticos WHERE nombre={ph}", (n,)))}
 
-    # Anti-copia: ocultar predicciones del lote actual si no todos completaron
-    pred_visible_max = lote_max  # por defecto: mostrar todo
-    if pronosticos_abiertos() and nombres:
-        try:
-            ph = placeholder()
-            completions = fetchall(db_execute(f"""
-                SELECT pr.nombre, COUNT(*) AS pred_count
-                FROM pronosticos pr
-                INNER JOIN partidos pa ON pa.id = pr.partido_id
-                WHERE pa.lote = {ph}
-                GROUP BY pr.nombre
-            """, (lote_max,)))
-            if completions:
-                completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
-                max_pred = max(r["pred_count"] for r in completions)
-                if max_pred > 0:
-                    incompletos = [n for n in nombres
-                                   if completion_by_user.get(n, 0) < max_pred]
-                    if incompletos:
-                        pred_visible_max = lote_max - 1
-        except Exception:
-            pass  # ante cualquier error, mostrar todo
-
     return render_template("todos.html",
                            partidos_json=todos_partidos, nombres=nombres,
                            pronosticos=prons, avatares=_avatares(),
-                           pred_visible_max=pred_visible_max)
+                           pred_visible_max=lote_max)
 
 # ── Admin ─────────────────────────────────────────────────────────
 
