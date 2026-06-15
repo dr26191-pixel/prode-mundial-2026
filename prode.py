@@ -304,9 +304,12 @@ def index():
             (nombre_param,)))
         previos = {r["partido_id"]: r for r in rows}
 
+    usuarios_existentes = [r["nombre"] for r in fetchall(db_execute(
+        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE,
-                           nombre_param=nombre_param, previos=previos)
+                           nombre_param=nombre_param, previos=previos,
+                           usuarios_existentes=usuarios_existentes)
 
 @app.route("/pronostico", methods=["POST"])
 def pronostico():
