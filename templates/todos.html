@@ -190,9 +190,12 @@
   <div class="carousel-wrap">
     <button class="arrow-btn" onclick="scrollCarousel(-1)">‹</button>
     <div class="carousel-track" id="ctrack">
+      <div class="u-pill active" onclick="selectUser(this,'__resultado__')">
+        <div class="u-init" style="background:linear-gradient(135deg,#27ae60,#1a5c2e);font-size:1.3rem;">⚽</div>
+        <span class="u-nombre">Resultado</span>
+      </div>
       {% for nombre in nombres %}
-      <div class="u-pill{% if loop.first %} active{% endif %}"
-           onclick="selectUser(this,'{{ nombre }}')">
+      <div class="u-pill" onclick="selectUser(this,'{{ nombre }}')">
         {% if avatares.get(nombre) %}
           <img class="u-av" src="{{ avatares[nombre] }}" alt="{{ nombre }}">
         {% else %}
@@ -232,7 +235,7 @@ const PRONS  = {{ pronosticos | tojson }};
 const NOMBRES = {{ nombres | tojson }};
 const PRED_VISIBLE_MAX = {{ pred_visible_max }};
 
-let curUser  = NOMBRES.length ? NOMBRES[0] : '';
+let curUser  = '__resultado__';
 let curFecha = 'all';
 
 function flagImg(nombre, size) {
@@ -290,7 +293,8 @@ function buildFechaBar() {
 
 /* Renderizar cards */
 function renderCards() {
-  document.getElementById('sel-nombre').textContent = curUser;
+  document.getElementById('sel-nombre').textContent =
+    curUser === '__resultado__' ? 'Resultado real' : curUser;
   const grid = document.getElementById('cards-grid');
 
   const filtered = PARS.filter(p => {
@@ -304,30 +308,35 @@ function renderCards() {
     return;
   }
 
-  const userProns = PRONS[curUser] || {};
+  const isResultado = curUser === '__resultado__';
+  const userProns   = isResultado ? {} : (PRONS[curUser] || {});
 
   grid.innerHTML = filtered.map(p => {
-    const pred = userProns[String(p.id)];
-    const predsVisible = (p.lote || 1) <= PRED_VISIBLE_MAX;
-    let scoreHtml, ptsHtml = '';
+    const pred    = userProns[String(p.id)];
+    const hasReal = p.goles_local !== null && p.goles_visit !== null;
+    let scoreHtml, ptsHtml = '', realHtml = '';
 
-    if (!predsVisible) {
-      scoreHtml = `<span class="no-pred" title="Se revela cuando todos completen">🔒</span>`;
-      ptsHtml   = `<span class="pts-b pnd">pendiente</span>`;
-    } else if (pred !== undefined) {
-      scoreHtml = `<span class="s-big">${pred.goles_local} – ${pred.goles_visit}</span>`;
-      if (pred.puntos !== null && pred.puntos !== undefined) {
-        const cls = pred.puntos === 3 ? 'p3' : (pred.puntos === 1 ? 'p1' : 'p0');
-        ptsHtml = `<span class="pts-b ${cls}">${pred.puntos} pts</span>`;
+    if (isResultado) {
+      if (hasReal) {
+        scoreHtml = `<span class="s-big">${p.goles_local} – ${p.goles_visit}</span>`;
       } else {
-        ptsHtml = `<span class="pts-b pnd">pendiente</span>`;
+        scoreHtml = `<span class="no-pred">–</span>`;
+        ptsHtml   = `<span class="pts-b pnd">sin resultado</span>`;
       }
     } else {
-      scoreHtml = `<span class="no-pred">– –</span>`;
+      realHtml = hasReal ? `<div class="s-real">Real: ${p.goles_local}–${p.goles_visit}</div>` : '';
+      if (pred !== undefined) {
+        scoreHtml = `<span class="s-big">${pred.goles_local} – ${pred.goles_visit}</span>`;
+        if (pred.puntos !== null && pred.puntos !== undefined) {
+          const cls = pred.puntos === 3 ? 'p3' : (pred.puntos === 1 ? 'p1' : 'p0');
+          ptsHtml = `<span class="pts-b ${cls}">${pred.puntos} pts</span>`;
+        } else {
+          ptsHtml = `<span class="pts-b pnd">pendiente</span>`;
+        }
+      } else {
+        scoreHtml = `<span class="no-pred">– –</span>`;
+      }
     }
-
-    const realHtml = (p.goles_local !== null && p.goles_visit !== null)
-      ? `<div class="s-real">Real: ${p.goles_local}–${p.goles_visit}</div>` : '';
 
     const sig_l = SIGLAS[p.equipo_local]  || p.equipo_local.substring(0,3).toUpperCase();
     const sig_v = SIGLAS[p.equipo_visit] || p.equipo_visit.substring(0,3).toUpperCase();
