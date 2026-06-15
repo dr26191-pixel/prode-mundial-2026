@@ -423,18 +423,14 @@ def todos():
     todos_completo = True
     lote_actual_nombre = f"Jornada {lote_max}"
     faltantes = []
-    try:
-        ph = placeholder()
-        lote_nombre_row = fetchone(db_execute(
-            f"SELECT nombre FROM lotes WHERE numero={ph}", (lote_max,)))
-        lote_actual_nombre = lote_nombre_row["nombre"] if lote_nombre_row else f"Jornada {lote_max}"
 
-        ph = placeholder()
-        count_row = fetchone(db_execute(
-            f"SELECT COUNT(*) AS cnt FROM partidos WHERE lote={ph}", (lote_max,)))
-        n_partidos_lote = count_row["cnt"] if count_row else 0
+    if pronosticos_abiertos() and nombres:
+        try:
+            ph = placeholder()
+            lote_nombre_row = fetchone(db_execute(
+                f"SELECT nombre FROM lotes WHERE numero={ph}", (lote_max,)))
+            lote_actual_nombre = lote_nombre_row["nombre"] if lote_nombre_row else f"Jornada {lote_max}"
 
-        if n_partidos_lote > 0 and nombres:
             ph = placeholder()
             completions = fetchall(db_execute(f"""
                 SELECT pr.nombre, COUNT(*) AS pred_count
@@ -443,12 +439,18 @@ def todos():
                 WHERE pa.lote = {ph}
                 GROUP BY pr.nombre
             """, (lote_max,)))
-            completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
-            faltantes = [n for n in nombres
-                         if completion_by_user.get(n, 0) < n_partidos_lote]
-            todos_completo = len(faltantes) == 0
-    except Exception:
-        todos_completo = True
+
+            if completions:
+                completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
+                # Usar el mayor recuento como referencia (evita problemas con partidos agregados tarde)
+                max_pred = max(r["pred_count"] for r in completions)
+                if max_pred > 0:
+                    faltantes = [n for n in nombres
+                                 if completion_by_user.get(n, 0) < max_pred]
+                    todos_completo = len(faltantes) == 0
+            # Si nadie cargó nada para este lote aún: todos_completo = True (nada que ocultar)
+        except Exception:
+            todos_completo = True
 
     # Partidos: siempre se muestran todos los del lote publicado
     # Predicciones: solo visibles en lotes anteriores al actual mientras no completen
