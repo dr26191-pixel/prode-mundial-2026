@@ -459,10 +459,44 @@ def todos():
             "puntos": r["puntos"]
         } for r in fetchall(db_execute(f"SELECT * FROM pronosticos WHERE nombre={ph}", (n,)))}
 
+    # Anti-copia: predicciones del lote actual ocultas hasta que todos completen
+    pred_visible_max = lote_max
+    todos_completo   = True
+    faltantes        = []
+    lote_actual_nombre = ""
+    try:
+        ph = placeholder()
+        n_row = fetchone(db_execute(
+            f"SELECT COUNT(*) AS cnt FROM partidos WHERE lote = {ph}", (lote_max,)))
+        n_partidos_lote = n_row["cnt"] if n_row else 0
+        if n_partidos_lote > 0 and nombres:
+            ph = placeholder()
+            lnrow = fetchone(db_execute(
+                f"SELECT nombre FROM lotes WHERE numero = {ph}", (lote_max,)))
+            lote_actual_nombre = lnrow["nombre"] if lnrow else f"Lote {lote_max}"
+            ph = placeholder()
+            completions = fetchall(db_execute(f"""
+                SELECT pr.nombre, COUNT(*) AS pred_count
+                FROM pronosticos pr
+                JOIN partidos pa ON pa.id = pr.partido_id
+                WHERE pa.lote = {ph}
+                GROUP BY pr.nombre
+            """, (lote_max,)))
+            done = {r["nombre"]: r["pred_count"] for r in completions}
+            faltantes = [n for n in nombres if done.get(n, 0) < n_partidos_lote]
+            todos_completo = len(faltantes) == 0
+            if not todos_completo:
+                pred_visible_max = lote_max - 1
+    except Exception:
+        pass
+
     return render_template("todos.html",
                            partidos_json=todos_partidos, nombres=nombres,
                            pronosticos=prons, avatares=_avatares(),
-                           pred_visible_max=lote_max)
+                           pred_visible_max=pred_visible_max,
+                           todos_completo=todos_completo,
+                           faltantes=faltantes,
+                           lote_actual_nombre=lote_actual_nombre)
 
 # ── Admin ─────────────────────────────────────────────────────────
 

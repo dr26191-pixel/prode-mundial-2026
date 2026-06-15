@@ -162,6 +162,15 @@
     .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
     .empty-state p:first-child { font-size: 2.5rem; margin-bottom: 10px; }
 
+    .lote-banner {
+      max-width: 900px; margin: 12px auto 0; border-radius: 10px;
+      padding: 11px 18px; font-size: .88rem; line-height: 1.6;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .lote-pending { background:#fff8e1; border:1.5px solid #ffc107; color:#7a5700; }
+    .lote-ok      { background:#d4edda; border:1.5px solid #27ae60; color:#155724; }
+    .lote-banner strong { font-weight:800; }
+    .lote-banner em { font-style:normal; font-weight:700; }
   </style>
 </head>
 <body>
@@ -182,6 +191,21 @@
     <a href="/admin">⚙️ Admin</a>
   </div>
 </div>
+
+{% if lote_actual_nombre %}
+  {% if not todos_completo %}
+  <div class="lote-banner lote-pending">
+    <span>🔒</span>
+    <div>Las predicciones de <strong>{{ lote_actual_nombre }}</strong> se revelan cuando todos completen.
+    {% if faltantes %}Falta{{ 'n' if faltantes|length > 1 }}: <em>{{ faltantes | join(', ') }}</em>{% endif %}</div>
+  </div>
+  {% else %}
+  <div class="lote-banner lote-ok">
+    <span>✅</span>
+    <div>Todos completaron <strong>{{ lote_actual_nombre }}</strong> — predicciones visibles.</div>
+  </div>
+  {% endif %}
+{% endif %}
 
 {% if nombres %}
 
@@ -312,8 +336,9 @@ function renderCards() {
   const userProns   = isResultado ? {} : (PRONS[curUser] || {});
 
   grid.innerHTML = filtered.map(p => {
-    const pred    = userProns[String(p.id)];
-    const hasReal = p.goles_local !== null && p.goles_visit !== null;
+    const pred         = userProns[String(p.id)];
+    const hasReal      = p.goles_local !== null && p.goles_visit !== null;
+    const predsVisible = (p.lote || 1) <= PRED_VISIBLE_MAX;
     let scoreHtml, ptsHtml = '', realHtml = '';
 
     if (isResultado) {
@@ -323,6 +348,9 @@ function renderCards() {
         scoreHtml = `<span class="no-pred">–</span>`;
         ptsHtml   = `<span class="pts-b pnd">sin resultado</span>`;
       }
+    } else if (!predsVisible) {
+      scoreHtml = `<span class="no-pred">🔒</span>`;
+      ptsHtml   = `<span class="pts-b pnd">pendiente</span>`;
     } else {
       realHtml = hasReal ? `<div class="s-real">Real: ${p.goles_local}–${p.goles_visit}</div>` : '';
       if (pred !== undefined) {
