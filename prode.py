@@ -419,43 +419,6 @@ def todos():
     nombres = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
 
-    # Chequear si todos completaron el lote actual
-    todos_completo = True
-    lote_actual_nombre = f"Jornada {lote_max}"
-    faltantes = []
-
-    if pronosticos_abiertos() and nombres:
-        try:
-            ph = placeholder()
-            lote_nombre_row = fetchone(db_execute(
-                f"SELECT nombre FROM lotes WHERE numero={ph}", (lote_max,)))
-            lote_actual_nombre = lote_nombre_row["nombre"] if lote_nombre_row else f"Jornada {lote_max}"
-
-            ph = placeholder()
-            completions = fetchall(db_execute(f"""
-                SELECT pr.nombre, COUNT(*) AS pred_count
-                FROM pronosticos pr
-                INNER JOIN partidos pa ON pa.id = pr.partido_id
-                WHERE pa.lote = {ph}
-                GROUP BY pr.nombre
-            """, (lote_max,)))
-
-            if completions:
-                completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
-                # Usar el mayor recuento como referencia (evita problemas con partidos agregados tarde)
-                max_pred = max(r["pred_count"] for r in completions)
-                if max_pred > 0:
-                    faltantes = [n for n in nombres
-                                 if completion_by_user.get(n, 0) < max_pred]
-                    todos_completo = len(faltantes) == 0
-            # Si nadie cargó nada para este lote aún: todos_completo = True (nada que ocultar)
-        except Exception:
-            todos_completo = True
-
-    # Partidos: siempre se muestran todos los del lote publicado
-    # Predicciones: solo visibles en lotes anteriores al actual mientras no completen
-    pred_visible_max = lote_max if todos_completo else lote_max - 1
-
     try:
         ph = placeholder()
         todos_partidos = fetchall(db_execute(
@@ -475,12 +438,32 @@ def todos():
             "puntos": r["puntos"]
         } for r in fetchall(db_execute(f"SELECT * FROM pronosticos WHERE nombre={ph}", (n,)))}
 
+    # Anti-copia: ocultar predicciones del lote actual si no todos completaron
+    pred_visible_max = lote_max  # por defecto: mostrar todo
+    if pronosticos_abiertos() and nombres:
+        try:
+            ph = placeholder()
+            completions = fetchall(db_execute(f"""
+                SELECT pr.nombre, COUNT(*) AS pred_count
+                FROM pronosticos pr
+                INNER JOIN partidos pa ON pa.id = pr.partido_id
+                WHERE pa.lote = {ph}
+                GROUP BY pr.nombre
+            """, (lote_max,)))
+            if completions:
+                completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
+                max_pred = max(r["pred_count"] for r in completions)
+                if max_pred > 0:
+                    incompletos = [n for n in nombres
+                                   if completion_by_user.get(n, 0) < max_pred]
+                    if incompletos:
+                        pred_visible_max = lote_max - 1
+        except Exception:
+            pass  # ante cualquier error, mostrar todo
+
     return render_template("todos.html",
                            partidos_json=todos_partidos, nombres=nombres,
                            pronosticos=prons, avatares=_avatares(),
-                           todos_completo=todos_completo,
-                           lote_actual_nombre=lote_actual_nombre,
-                           faltantes=faltantes,
                            pred_visible_max=pred_visible_max)
 
 # ── Admin ─────────────────────────────────────────────────────────

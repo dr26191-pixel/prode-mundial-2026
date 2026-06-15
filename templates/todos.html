@@ -162,14 +162,6 @@
     .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
     .empty-state p:first-child { font-size: 2.5rem; margin-bottom: 10px; }
 
-    .locked-banner {
-      max-width: 900px; margin: 14px auto 0; border-radius: 10px;
-      background: #fff8e1; border: 1.5px solid #ffc107; color: #7a5700;
-      padding: 12px 18px; display: flex; align-items: flex-start; gap: 12px;
-      font-size: .88rem; line-height: 1.5;
-    }
-    .locked-banner .lb-icon { font-size: 1.4rem; flex-shrink: 0; padding-top: 2px; }
-    .locked-banner strong { font-weight: 800; color: #5a3e00; display: block; margin-bottom: 2px; }
   </style>
 </head>
 <body>
@@ -190,17 +182,6 @@
     <a href="/admin">⚙️ Admin</a>
   </div>
 </div>
-
-{% if not todos_completo %}
-<div class="locked-banner">
-  <span class="lb-icon">🔒</span>
-  <div>
-    <strong>Predicciones de {{ lote_actual_nombre }} ocultas</strong>
-    Las predicciones de este lote se revelan cuando todos completen.
-    {% if faltantes %}Falta{{ 'n' if faltantes|length > 1 else '' }}: <strong>{{ faltantes | join(', ') }}</strong>{% endif %}
-  </div>
-</div>
-{% endif %}
 
 {% if nombres %}
 
