@@ -304,9 +304,12 @@ def index():
             (nombre_param,)))
         previos = {r["partido_id"]: r for r in rows}
 
+    usuarios_existentes = [r["nombre"] for r in fetchall(db_execute(
+        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE,
-                           nombre_param=nombre_param, previos=previos)
+                           nombre_param=nombre_param, previos=previos,
+                           usuarios_existentes=usuarios_existentes)
 
 @app.route("/pronostico", methods=["POST"])
 def pronostico():
@@ -315,7 +318,12 @@ def pronostico():
         return redirect(url_for("index"))
     nombre = request.form.get("nombre", "").strip()
     if not nombre:
-        flash("Ingresá tu nombre para guardar los pronósticos.")
+        flash("Seleccioná tu nombre para guardar los pronósticos.")
+        return redirect(url_for("index"))
+    usuarios_validos = [r["nombre"] for r in fetchall(db_execute(
+        "SELECT DISTINCT nombre FROM pronosticos"))]
+    if usuarios_validos and nombre not in usuarios_validos:
+        flash("Nombre no reconocido. Seleccioná tu nombre de la lista.")
         return redirect(url_for("index"))
 
     p = placeholder()
@@ -413,17 +421,56 @@ def todos():
         lote_row = fetchone(db_execute(
             "SELECT COALESCE(MAX(numero), 99) AS m FROM lotes WHERE publicado=1"))
         lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
+    except Exception:
+        lote_max = 99
+
+    nombres = [r["nombre"] for r in fetchall(db_execute(
+        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
+
+    # Chequear si todos completaron el lote actual
+    todos_completo = True
+    lote_actual_nombre = f"Jornada {lote_max}"
+    faltantes = []
+    try:
+        ph = placeholder()
+        lote_nombre_row = fetchone(db_execute(
+            f"SELECT nombre FROM lotes WHERE numero={ph}", (lote_max,)))
+        lote_actual_nombre = lote_nombre_row["nombre"] if lote_nombre_row else f"Jornada {lote_max}"
+
+        ph = placeholder()
+        count_row = fetchone(db_execute(
+            f"SELECT COUNT(*) AS cnt FROM partidos WHERE lote={ph}", (lote_max,)))
+        n_partidos_lote = count_row["cnt"] if count_row else 0
+
+        if n_partidos_lote > 0 and nombres:
+            ph = placeholder()
+            completions = fetchall(db_execute(f"""
+                SELECT pr.nombre, COUNT(*) AS pred_count
+                FROM pronosticos pr
+                INNER JOIN partidos pa ON pa.id = pr.partido_id
+                WHERE pa.lote = {ph}
+                GROUP BY pr.nombre
+            """, (lote_max,)))
+            completion_by_user = {r["nombre"]: r["pred_count"] for r in completions}
+            faltantes = [n for n in nombres
+                         if completion_by_user.get(n, 0) < n_partidos_lote]
+            todos_completo = len(faltantes) == 0
+    except Exception:
+        todos_completo = True
+
+    lote_visible_max = lote_max if todos_completo else lote_max - 1
+
+    try:
         ph = placeholder()
         todos_partidos = fetchall(db_execute(
-            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
+            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id",
+            (lote_visible_max,)))
     except Exception:
         todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
 
     for p in todos_partidos:
         p["fase_label"] = lote_label(p)
 
-    nombres = [r["nombre"] for r in fetchall(db_execute(
-        "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     ph = placeholder()
     prons = {}
     for n in nombres:
@@ -435,7 +482,10 @@ def todos():
 
     return render_template("todos.html",
                            partidos_json=todos_partidos, nombres=nombres,
-                           pronosticos=prons, avatares=_avatares())
+                           pronosticos=prons, avatares=_avatares(),
+                           todos_completo=todos_completo,
+                           lote_actual_nombre=lote_actual_nombre,
+                           faltantes=faltantes)
 
 # ── Admin ─────────────────────────────────────────────────────────
 
