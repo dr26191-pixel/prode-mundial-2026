@@ -287,8 +287,12 @@ def index():
             "SELECT COALESCE(MAX(numero), 99) AS m FROM lotes WHERE publicado=1"))
         lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
         ph = placeholder()
-        partidos = fetchall(db_execute(
-            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
+        if lote_max < 99:
+            # Mostrar solo el lote activo (el publicado más alto)
+            partidos = fetchall(db_execute(
+                f"SELECT * FROM partidos WHERE lote = {ph} ORDER BY fecha, id", (lote_max,)))
+        else:
+            partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     except Exception:
         partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     for partido in partidos:
