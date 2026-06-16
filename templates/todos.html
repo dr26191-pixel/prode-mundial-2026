@@ -159,6 +159,10 @@
     .empty-msg { grid-column: 1 / -1; text-align: center; padding: 40px 20px;
       color: var(--gray); font-size: .92rem; }
 
+    .card-done   { background:#f0fdf4; border-color:#86efac; }
+    .card-locked { background:#fffbeb; border-color:#fcd34d; }
+    .card-missed { background:#fef2f2; border-color:#fca5a5; }
+
     .empty-state { text-align: center; padding: 60px 20px; color: var(--gray); }
     .empty-state p:first-child { font-size: 2.5rem; margin-bottom: 10px; }
 
@@ -370,7 +374,14 @@ function renderCards() {
     const sig_v = SIGLAS[p.equipo_visit] || p.equipo_visit.substring(0,3).toUpperCase();
     const fechaShort = p.fecha ? p.fecha.split(' ')[0] : '';
 
-    return `<div class="card">
+    let cardClass = '';
+    if (!isResultado) {
+      if (!predsVisible)              cardClass = 'card-locked';
+      else if (pred !== undefined)    cardClass = 'card-done';
+      else if (hasReal)               cardClass = 'card-missed';
+    }
+
+    return `<div class="card ${cardClass}">
       <div class="c-fase">${p.fase_label}</div>
       <div class="c-teams">
         <div class="c-eq">${flagImg(p.equipo_local,34)}<span class="c-sig">${sig_l}</span></div>
