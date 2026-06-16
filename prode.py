@@ -99,11 +99,11 @@ app.jinja_env.globals["banderas"]    = FLAG_CODES  # por si algún template usa 
 ADMIN_PASSWORD      = os.environ.get("ADMIN_PASSWORD", "gipa2026")
 DATABASE_URL        = os.environ.get("DATABASE_URL")        # Render lo setea automáticamente
 FOOTBALL_DATA_KEY   = os.environ.get("FOOTBALL_DATA_KEY", "")
-FECHA_CIERRE        = "2026-06-15"   # pronósticos abiertos hasta este día inclusive
-_FECHA_LIMITE_ORD   = 615            # _fecha_ord("15/06 ...") = 615; < 616 = antes del 16/06
+FECHA_CIERRE        = "2026-06-15"   # referencia histórica (ya no cierra automáticamente)
+_FECHA_LIMITE_ORD   = 615            # partidos del 15/06 o antes quedan bloqueados
 
 def pronosticos_abiertos():
-    return datetime.now().date() <= datetime.strptime(FECHA_CIERRE, "%Y-%m-%d").date()
+    return True  # el cierre lo controla el admin publicando/ocultando lotes
 
 def partido_bloqueado(p):
     """True si el partido ya tiene resultado O su fecha es anterior al 16/06."""
