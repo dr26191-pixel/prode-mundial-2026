@@ -648,11 +648,7 @@ def logout():
 
 # ── Reporte estadísticas ──────────────────────────────────────────
 
-@app.route("/admin/reporte")
-def admin_reporte():
-    if not session.get("admin"): return redirect(url_for("admin"))
-
-    # KPIs globales
+def _reporte_data():
     g_row = fetchone(db_execute("""
         SELECT COUNT(DISTINCT pa.id)                               AS partidos_jugados,
                COUNT(DISTINCT pr.nombre)                           AS participantes,
@@ -664,8 +660,6 @@ def admin_reporte():
         JOIN partidos pa ON pa.id = pr.partido_id
         WHERE pr.puntos IS NOT NULL
     """)) or {}
-
-    # Stats por partido
     partidos_stats = fetchall(db_execute("""
         SELECT pa.id, pa.equipo_local, pa.equipo_visit,
                pa.goles_local, pa.goles_visit, pa.fase,
@@ -686,8 +680,6 @@ def admin_reporte():
         p["pct_fallido"]   = round(p["fallidos"]   * 100 / t, 1)
         p["label"] = f"{p['equipo_local']} vs {p['equipo_visit']}"
     partidos_stats.sort(key=lambda x: x["pct_exacto"], reverse=True)
-
-    # Stats por usuario
     usuarios_stats = fetchall(db_execute("""
         SELECT nombre,
                COUNT(*)                                            AS jugados,
@@ -700,9 +692,22 @@ def admin_reporte():
         GROUP BY nombre
         ORDER BY total DESC, exactos DESC
     """))
+    return g_row, partidos_stats, usuarios_stats
 
+@app.route("/reporte")
+def reporte():
+    g, partidos_stats, usuarios_stats = _reporte_data()
     return render_template("admin_reporte.html",
-                           g=g_row,
+                           g=g,
+                           partidos_stats=partidos_stats,
+                           usuarios_stats=usuarios_stats)
+
+@app.route("/admin/reporte")
+def admin_reporte():
+    if not session.get("admin"): return redirect(url_for("admin"))
+    g, partidos_stats, usuarios_stats = _reporte_data()
+    return render_template("admin_reporte.html",
+                           g=g,
                            partidos_stats=partidos_stats,
                            usuarios_stats=usuarios_stats)
 
