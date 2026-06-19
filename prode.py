@@ -646,6 +646,66 @@ def logout():
     session.pop("admin", None)
     return redirect(url_for("index"))
 
+# ── Reporte estadísticas ──────────────────────────────────────────
+
+@app.route("/admin/reporte")
+def admin_reporte():
+    if not session.get("admin"): return redirect(url_for("admin"))
+
+    # KPIs globales
+    g_row = fetchone(db_execute("""
+        SELECT COUNT(DISTINCT pa.id)                               AS partidos_jugados,
+               COUNT(DISTINCT pr.nombre)                           AS participantes,
+               COUNT(*)                                            AS total_prons,
+               SUM(CASE WHEN pr.puntos=3 THEN 1 ELSE 0 END)       AS total_exactos,
+               SUM(CASE WHEN pr.puntos=1 THEN 1 ELSE 0 END)       AS total_resultados,
+               SUM(CASE WHEN pr.puntos=0 THEN 1 ELSE 0 END)       AS total_fallidos
+        FROM pronosticos pr
+        JOIN partidos pa ON pa.id = pr.partido_id
+        WHERE pr.puntos IS NOT NULL
+    """)) or {}
+
+    # Stats por partido
+    partidos_stats = fetchall(db_execute("""
+        SELECT pa.id, pa.equipo_local, pa.equipo_visit,
+               pa.goles_local, pa.goles_visit, pa.fase,
+               COUNT(*)                                            AS total,
+               SUM(CASE WHEN pr.puntos=3 THEN 1 ELSE 0 END)       AS exactos,
+               SUM(CASE WHEN pr.puntos=1 THEN 1 ELSE 0 END)       AS resultados,
+               SUM(CASE WHEN pr.puntos=0 THEN 1 ELSE 0 END)       AS fallidos
+        FROM pronosticos pr
+        JOIN partidos pa ON pa.id = pr.partido_id
+        WHERE pr.puntos IS NOT NULL
+        GROUP BY pa.id, pa.equipo_local, pa.equipo_visit,
+                 pa.goles_local, pa.goles_visit, pa.fase
+    """))
+    for p in partidos_stats:
+        t = p["total"] or 1
+        p["pct_exacto"]    = round(p["exactos"]    * 100 / t, 1)
+        p["pct_resultado"] = round(p["resultados"] * 100 / t, 1)
+        p["pct_fallido"]   = round(p["fallidos"]   * 100 / t, 1)
+        p["label"] = f"{p['equipo_local']} vs {p['equipo_visit']}"
+    partidos_stats.sort(key=lambda x: x["pct_exacto"], reverse=True)
+
+    # Stats por usuario
+    usuarios_stats = fetchall(db_execute("""
+        SELECT nombre,
+               COUNT(*)                                            AS jugados,
+               SUM(CASE WHEN puntos=3 THEN 1 ELSE 0 END)          AS exactos,
+               SUM(CASE WHEN puntos=1 THEN 1 ELSE 0 END)          AS resultados,
+               SUM(CASE WHEN puntos=0 THEN 1 ELSE 0 END)          AS fallidos,
+               COALESCE(SUM(puntos), 0)                            AS total
+        FROM pronosticos
+        WHERE puntos IS NOT NULL
+        GROUP BY nombre
+        ORDER BY total DESC, exactos DESC
+    """))
+
+    return render_template("admin_reporte.html",
+                           g=g_row,
+                           partidos_stats=partidos_stats,
+                           usuarios_stats=usuarios_stats)
+
 # ── Export CSV ────────────────────────────────────────────────────
 
 @app.route("/admin/export-csv")
