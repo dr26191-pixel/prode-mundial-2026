@@ -718,21 +718,30 @@ def _reporte_data():
                 pid_order.append(pid)
             pid_pts[pid][row["nombre"]] = row["puntos"]
 
-        def _mlabel(info):
+        def _day(info):
             m = re.match(r"(\d{1,2}/\d{1,2})", str(info["fecha"]))
-            prefix = m.group(1) + " " if m else ""
-            return f"{prefix}{info['local'][:3].upper()}-{info['visit'][:3].upper()}"
+            return m.group(1) if m else "S/F"
+
+        # Agrupar partidos por día (en orden de primera aparición)
+        day_pids, day_order = {}, []
+        for pid in pid_order:
+            day = _day(pid_info[pid])
+            if day not in day_pids:
+                day_pids[day] = []
+                day_order.append(day)
+            day_pids[day].append(pid)
 
         evo_users = sorted({r["nombre"] for r in evo_rows})
         cumulative = {u: 0 for u in evo_users}
         evo_ranks  = {u: [] for u in evo_users}
-        for pid in pid_order:
-            for u, pts in pid_pts[pid].items():
-                cumulative[u] = cumulative.get(u, 0) + pts
+        for day in day_order:
+            for pid in day_pids[day]:
+                for u, pts in pid_pts[pid].items():
+                    cumulative[u] = cumulative.get(u, 0) + pts
             order = sorted(evo_users, key=lambda u: (-cumulative[u], u))
             for u in evo_users:
                 evo_ranks[u].append(order.index(u) + 1)
-            evo_labels.append(_mlabel(pid_info[pid]))
+            evo_labels.append(day)
 
     return g_row, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks
 
