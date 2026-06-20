@@ -692,24 +692,61 @@ def _reporte_data():
         GROUP BY nombre
         ORDER BY total DESC, exactos DESC
     """))
-    return g_row, partidos_stats, usuarios_stats
 
-@app.route("/reporte")
-def reporte():
-    g, partidos_stats, usuarios_stats = _reporte_data()
+    # ── Evolución de posiciones por lote ──────────────────────────
+    evo_rows = fetchall(db_execute("""
+        SELECT pa.id AS partido_id, COALESCE(pa.lote, 0) AS lote,
+               pr.nombre, pr.puntos
+        FROM partidos pa
+        JOIN pronosticos pr ON pr.partido_id = pa.id
+        WHERE pr.puntos IS NOT NULL
+        ORDER BY COALESCE(pa.lote, 0), pa.id
+    """))
+    evo_labels, evo_users, evo_ranks = [], [], {}
+    if evo_rows:
+        pid_pts, pid_lote = {}, {}
+        for row in evo_rows:
+            pid = row["partido_id"]
+            if pid not in pid_pts:
+                pid_pts[pid] = {}
+                pid_lote[pid] = row["lote"]
+            pid_pts[pid][row["nombre"]] = row["puntos"]
+        lote_pids = {}
+        for pid, lote in pid_lote.items():
+            lote_pids.setdefault(lote, []).append(pid)
+        evo_users = sorted({r["nombre"] for r in evo_rows})
+        cumulative = {u: 0 for u in evo_users}
+        evo_ranks  = {u: [] for u in evo_users}
+        for lote in sorted(lote_pids.keys()):
+            for pid in sorted(lote_pids[lote]):
+                for u, pts in pid_pts[pid].items():
+                    cumulative[u] = cumulative.get(u, 0) + pts
+            order = sorted(evo_users, key=lambda u: -cumulative[u])
+            for u in evo_users:
+                evo_ranks[u].append(order.index(u) + 1)
+            evo_labels.append(f"Lote {lote}")
+
+    return g_row, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks
+
+def _render_reporte(**extra):
+    g, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks = _reporte_data()
     return render_template("admin_reporte.html",
                            g=g,
                            partidos_stats=partidos_stats,
-                           usuarios_stats=usuarios_stats)
+                           usuarios_stats=usuarios_stats,
+                           evo_labels=evo_labels,
+                           evo_users=evo_users,
+                           evo_ranks=evo_ranks,
+                           **extra)
+
+@app.route("/reporte")
+def reporte():
+    return _render_reporte()
 
 @app.route("/admin/reporte")
 def admin_reporte():
     if not session.get("admin"): return redirect(url_for("admin"))
-    g, partidos_stats, usuarios_stats = _reporte_data()
-    return render_template("admin_reporte.html",
-                           g=g,
-                           partidos_stats=partidos_stats,
-                           usuarios_stats=usuarios_stats)
+    return _render_reporte()
 
 # ── Export CSV ────────────────────────────────────────────────────
 

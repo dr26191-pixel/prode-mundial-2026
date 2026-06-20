@@ -212,10 +212,14 @@
       <div class="ins-val">{{ mas_exacto.nombre }}</div>
       <div class="ins-sub">{{ mas_exacto.exactos }} exactos de {{ mas_exacto.jugados }} jugados</div>
     </div>
-    <div class="insight">
-      <div class="ins-lbl">⚽ Más pronósticos</div>
-      <div class="ins-val">{{ mas_jugado.nombre }}</div>
-      <div class="ins-sub">{{ mas_jugado.jugados }} partidos pronosticados</div>
+    {% set ultimo = usuarios_stats[-1] %}
+    <div class="insight ins-red">
+      <div class="ins-lbl">🔴 Último lugar</div>
+      <div class="ins-val">{{ ultimo.nombre }}</div>
+      <div class="ins-sub">
+        {{ ultimo.total }} pts · {{ lider.total - ultimo.total }} pts del líder ·
+        {{ ultimo.fallidos }} fallidos ({{ (ultimo.fallidos * 100 / (ultimo.jugados or 1)) | round(0) | int }}%)
+      </div>
     </div>
   </div>
 
@@ -249,6 +253,17 @@
         <div class="pod-base"></div>
       </div>
       {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Gráfico evolutivo de posiciones -->
+  {% if evo_labels and evo_labels | length > 0 %}
+  <div class="section">
+    <h2>📈 Evolución de posiciones por lote</h2>
+    <p style="font-size:.78rem;color:var(--gray);margin-bottom:12px">Posición #1 = líder. Línea más arriba = mejor ranking.</p>
+    <div class="chart-wrap" style="height:300px">
+      <canvas id="chartEvo"></canvas>
     </div>
   </div>
   {% endif %}
@@ -448,6 +463,49 @@ const AZUL  = 'rgba(45,111,160,.85)';
 const ORO1  = 'rgba(212,175,55,.95)';
 const PLATA = 'rgba(170,169,173,.95)';
 const BRON  = 'rgba(176,100,50,.95)';
+
+/* Evolución de posiciones */
+const evoLabels = {{ evo_labels | tojson }};
+const evoUsers  = {{ evo_users  | tojson }};
+const evoRanks  = {{ evo_ranks  | tojson }};
+const EVOpalette = ['#4A90D9','#e74c3c','#27ae60','#c8860a','#9b59b6','#e67e22','#1abc9c','#e91e63','#00bcd4','#ff5722'];
+
+if (document.getElementById('chartEvo') && evoLabels.length) {
+  const n = evoUsers.length;
+  const datasets = evoUsers.map((u, i) => ({
+    label: u,
+    data: evoRanks[u],
+    borderColor: EVOpalette[i % EVOpalette.length],
+    backgroundColor: 'transparent',
+    tension: 0.35,
+    pointRadius: 5,
+    pointHoverRadius: 8,
+    borderWidth: 2.5,
+  }));
+  new Chart(document.getElementById('chartEvo'), {
+    type: 'line',
+    data: { labels: evoLabels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { font: { size: 12 }, boxWidth: 14 } },
+        tooltip: { callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: #${ctx.parsed.y}`
+        }}
+      },
+      scales: {
+        y: {
+          reverse: true,
+          min: 1, max: n,
+          ticks: { stepSize: 1, callback: v => Number.isInteger(v) ? `#${v}` : '' },
+          grid: { color: '#e8f0fa' },
+          title: { display: true, text: 'Posición', font: { size: 11 } }
+        },
+        x: { grid: { color: '#e8f0fa' } }
+      }
+    }
+  });
+}
 
 /* Ranking usuarios */
 if (document.getElementById('chartUsuarios') && uLabels.length) {
