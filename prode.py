@@ -1,4 +1,5 @@
 import os
+import re
 import csv
 import io
 import json
@@ -693,38 +694,45 @@ def _reporte_data():
         ORDER BY total DESC, exactos DESC
     """))
 
-    # ── Evolución de posiciones por lote ──────────────────────────
+    # ── Evolución de posiciones por partido jugado ────────────────
     evo_rows = fetchall(db_execute("""
-        SELECT pa.id AS partido_id, COALESCE(pa.lote, 0) AS lote,
+        SELECT pa.id AS partido_id,
+               pa.equipo_local, pa.equipo_visit,
+               COALESCE(pa.fecha, '') AS fecha,
                pr.nombre, pr.puntos
         FROM partidos pa
         JOIN pronosticos pr ON pr.partido_id = pa.id
         WHERE pr.puntos IS NOT NULL
-        ORDER BY COALESCE(pa.lote, 0), pa.id
+        ORDER BY pa.id
     """))
     evo_labels, evo_users, evo_ranks = [], [], {}
     if evo_rows:
-        pid_pts, pid_lote = {}, {}
+        pid_pts, pid_info, pid_order = {}, {}, []
         for row in evo_rows:
             pid = row["partido_id"]
             if pid not in pid_pts:
                 pid_pts[pid] = {}
-                pid_lote[pid] = row["lote"]
+                pid_info[pid] = {"local": row["equipo_local"],
+                                 "visit": row["equipo_visit"],
+                                 "fecha": row["fecha"]}
+                pid_order.append(pid)
             pid_pts[pid][row["nombre"]] = row["puntos"]
-        lote_pids = {}
-        for pid, lote in pid_lote.items():
-            lote_pids.setdefault(lote, []).append(pid)
+
+        def _mlabel(info):
+            m = re.match(r"(\d{1,2}/\d{1,2})", str(info["fecha"]))
+            prefix = m.group(1) + " " if m else ""
+            return f"{prefix}{info['local'][:3].upper()}-{info['visit'][:3].upper()}"
+
         evo_users = sorted({r["nombre"] for r in evo_rows})
         cumulative = {u: 0 for u in evo_users}
         evo_ranks  = {u: [] for u in evo_users}
-        for lote in sorted(lote_pids.keys()):
-            for pid in sorted(lote_pids[lote]):
-                for u, pts in pid_pts[pid].items():
-                    cumulative[u] = cumulative.get(u, 0) + pts
-            order = sorted(evo_users, key=lambda u: -cumulative[u])
+        for pid in pid_order:
+            for u, pts in pid_pts[pid].items():
+                cumulative[u] = cumulative.get(u, 0) + pts
+            order = sorted(evo_users, key=lambda u: (-cumulative[u], u))
             for u in evo_users:
                 evo_ranks[u].append(order.index(u) + 1)
-            evo_labels.append(f"Lote {lote}")
+            evo_labels.append(_mlabel(pid_info[pid]))
 
     return g_row, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks
 
