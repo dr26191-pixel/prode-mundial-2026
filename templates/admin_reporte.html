@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reporte – Prode GiPA Argentina Mundial 2026</title>
+  <title>Estadísticas – Prode GiPA Argentina Mundial 2026</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,27 +35,63 @@
 
     .container { max-width:960px; margin:0 auto; padding:24px 12px 60px; }
 
+    /* Separador de sección */
+    .sec-titulo { font-size:1rem; font-weight:900; color:var(--azul3);
+      margin:28px 0 14px; padding-left:4px; display:flex; align-items:center; gap:8px; }
+    .sec-titulo::after { content:''; flex:1; height:2px; background:linear-gradient(90deg,var(--azul2),transparent); }
+
     /* KPI cards */
-    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    .kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
       gap:12px; margin-bottom:24px; }
     .kpi { background:#fff; border-radius:12px; padding:16px 14px;
       box-shadow:0 2px 10px rgba(45,111,160,.1); text-align:center; }
     .kpi .val { font-size:2rem; font-weight:900; color:var(--azul3); line-height:1; }
-    .kpi .lbl { font-size:.73rem; color:var(--gray); margin-top:5px; font-weight:600;
+    .kpi .lbl { font-size:.72rem; color:var(--gray); margin-top:5px; font-weight:600;
       text-transform:uppercase; letter-spacing:.04em; }
     .kpi.green .val { color:var(--green); }
     .kpi.gold  .val { color:#c8860a; }
     .kpi.red   .val { color:var(--red); }
 
+    /* Tarjetas de análisis */
+    .insight-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:12px; margin-bottom:20px; }
+    .insight { background:#fff; border-radius:12px; padding:14px 16px;
+      box-shadow:0 2px 10px rgba(45,111,160,.1);
+      border-left:4px solid var(--azul2); }
+    .insight .ins-lbl { font-size:.72rem; font-weight:700; color:var(--gray);
+      text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px; }
+    .insight .ins-val { font-size:1.05rem; font-weight:900; color:var(--azul3); line-height:1.2; }
+    .insight .ins-sub { font-size:.75rem; color:var(--gray); margin-top:3px; }
+    .insight.ins-gold  { border-left-color:#c8860a; }
+    .insight.ins-green { border-left-color:var(--green); }
+    .insight.ins-red   { border-left-color:var(--red); }
+
+    /* Podio top-3 */
+    .podio { display:flex; justify-content:center; align-items:flex-end;
+      gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+    .podio-item { text-align:center; flex:1; min-width:100px; max-width:160px; }
+    .podio-item .corona { font-size:1.6rem; }
+    .podio-item .pod-nombre { font-weight:800; font-size:.9rem; margin:4px 0 2px;
+      overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .podio-item .pod-pts { font-size:1.3rem; font-weight:900; color:var(--azul3); }
+    .podio-item .pod-sub { font-size:.72rem; color:var(--gray); margin-top:2px; }
+    .podio-item .pod-base {
+      background:linear-gradient(180deg,#dde8f5,#c8d8ed);
+      border-radius:8px 8px 0 0; margin-top:8px; padding:10px 6px 6px;
+    }
+    .podio-item.p1 .pod-base { height:80px; background:linear-gradient(180deg,#fef3cd,#f6d860); }
+    .podio-item.p2 .pod-base { height:60px; background:linear-gradient(180deg,#e8e8e8,#c8c8c8); }
+    .podio-item.p3 .pod-base { height:44px; background:linear-gradient(180deg,#f5e6d0,#d4a06a); }
+
     /* Sections */
     .section { background:#fff; border-radius:12px;
-      box-shadow:0 2px 12px rgba(45,111,160,.1); padding:20px 18px; margin-bottom:20px; }
-    .section h2 { font-size:.95rem; font-weight:800; color:var(--azul3);
-      margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--light); }
+      box-shadow:0 2px 12px rgba(45,111,160,.1); padding:20px 18px; margin-bottom:16px; }
+    .section h2 { font-size:.92rem; font-weight:800; color:var(--azul3);
+      margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--light); }
 
     .chart-wrap { position:relative; width:100%; }
 
-    /* Tabla detalle */
+    /* Tabla */
     .tbl { width:100%; border-collapse:collapse; font-size:.82rem; }
     .tbl th { background:var(--azul3); color:#fff; padding:8px 10px;
       text-align:left; font-weight:700; white-space:nowrap; }
@@ -68,17 +104,22 @@
     .badge-green { background:#d5f5e3; color:#1a7a3c; }
     .badge-gold  { background:#fef3cd; color:#856404; }
     .badge-red   { background:#fde8e8; color:#a01010; }
+    .badge-azul  { background:#dce8f8; color:var(--azul3); }
 
     .bar-mini { height:8px; border-radius:4px; background:#e0e8f5; overflow:hidden;
-      display:flex; gap:0; }
+      display:flex; }
     .bar-mini .seg-green { background:var(--green); }
     .bar-mini .seg-gold  { background:var(--gold); }
     .bar-mini .seg-red   { background:#e74c3c; }
+
+    .divider { border:none; border-top:2px dashed #dde8f5; margin:32px 0 8px; }
 
     @media (max-width:600px) {
       .kpi .val { font-size:1.6rem; }
       .tbl { font-size:.76rem; }
       .tbl th, .tbl td { padding:6px 7px; }
+      .insight-grid { grid-template-columns:1fr 1fr; }
+      .podio-item { min-width:80px; }
     }
   </style>
 </head>
@@ -88,27 +129,29 @@
   <div class="header-inner">
     <div class="header-logo"><img src="/static/Logo_gipa.png" alt="GiPA"></div>
     <div class="header-titulo">
-      <h1>📊 Reporte de estadísticas</h1>
+      <h1>📊 Estadísticas</h1>
       <p>Prode GiPA Argentina · Mundial 2026</p>
     </div>
   </div>
   <div class="header-links">
     <a href="/">🏠 Inicio</a>
     <a href="/tabla">🏆 Tabla</a>
+    <a href="/reporte" class="active">📊 Estadísticas</a>
     <a href="/todos">👥 Todos</a>
+    {% if session.get('admin') %}
     <a href="/admin">⚙️ Admin</a>
-    <a href="/admin/reporte" class="active">📊 Reporte</a>
     <a href="/admin/logout">Salir</a>
+    {% endif %}
   </div>
 </div>
 
 <div class="container">
 
-  <!-- KPIs -->
+  <!-- ── KPIs globales ── -->
   <div class="kpi-grid">
     <div class="kpi">
       <div class="val">{{ g.partidos_jugados or 0 }}</div>
-      <div class="lbl">Partidos con resultado</div>
+      <div class="lbl">Partidos jugados</div>
     </div>
     <div class="kpi">
       <div class="val">{{ g.participantes or 0 }}</div>
@@ -135,47 +178,196 @@
     </div>
   </div>
 
-  {% if not partidos_stats %}
+  {% if not usuarios_stats %}
   <div class="section">
     <p style="text-align:center;color:var(--gray);padding:20px">
-      Todavía no hay partidos con resultados cargados y pronósticos evaluados.
+      Todavía no hay pronósticos evaluados.
     </p>
   </div>
   {% else %}
 
-  <!-- Gráfico: % exactos por partido -->
-  <div class="section">
-    <h2>⚽ Partidos: % de marcador exacto (de mayor a menor)</h2>
-    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 260]|max }}px">
-      <canvas id="chartPartidos"></canvas>
+  <!-- ══ SECCIÓN USUARIOS ══ -->
+  <div class="sec-titulo">👥 Ranking de jugadores</div>
+
+  <!-- Análisis destacados -->
+  {% set lider = usuarios_stats[0] %}
+  {% set mas_exacto = usuarios_stats | sort(attribute='exactos', reverse=True) | first %}
+  {% set mas_jugado = usuarios_stats | sort(attribute='jugados', reverse=True) | first %}
+  <div class="insight-grid">
+    <div class="insight ins-gold">
+      <div class="ins-lbl">🥇 Líder actual</div>
+      <div class="ins-val">{{ lider.nombre }}</div>
+      <div class="ins-sub">{{ lider.total }} pts · {{ lider.exactos }} exactos</div>
+    </div>
+    {% if usuarios_stats | length >= 2 %}
+    {% set segundo = usuarios_stats[1] %}
+    <div class="insight">
+      <div class="ins-lbl">📏 Diferencia al 2°</div>
+      <div class="ins-val">{{ lider.total - segundo.total }} pts</div>
+      <div class="ins-sub">{{ lider.nombre }} vs {{ segundo.nombre }}</div>
+    </div>
+    {% endif %}
+    <div class="insight ins-green">
+      <div class="ins-lbl">🎯 Más marcadores exactos</div>
+      <div class="ins-val">{{ mas_exacto.nombre }}</div>
+      <div class="ins-sub">{{ mas_exacto.exactos }} exactos de {{ mas_exacto.jugados }} jugados</div>
+    </div>
+    <div class="insight">
+      <div class="ins-lbl">⚽ Más pronósticos</div>
+      <div class="ins-val">{{ mas_jugado.nombre }}</div>
+      <div class="ins-sub">{{ mas_jugado.jugados }} partidos pronosticados</div>
     </div>
   </div>
 
-  <!-- Gráfico: distribución exacto/resultado/fallido por partido -->
+  <!-- Podio top 3 -->
+  {% if usuarios_stats | length >= 2 %}
   <div class="section">
-    <h2>📊 Distribución por partido (exacto / resultado / fallido)</h2>
-    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 260]|max }}px">
-      <canvas id="chartDistPartidos"></canvas>
+    <h2>🏆 Podio</h2>
+    <div class="podio">
+      {% if usuarios_stats | length >= 2 %}
+      <div class="podio-item p2">
+        <div class="corona">🥈</div>
+        <div class="pod-nombre">{{ usuarios_stats[1].nombre }}</div>
+        <div class="pod-pts">{{ usuarios_stats[1].total }}<span style="font-size:.75rem;font-weight:600;color:var(--gray)"> pts</span></div>
+        <div class="pod-sub">{{ usuarios_stats[1].exactos }} exactos</div>
+        <div class="pod-base"></div>
+      </div>
+      {% endif %}
+      <div class="podio-item p1">
+        <div class="corona">🥇</div>
+        <div class="pod-nombre">{{ usuarios_stats[0].nombre }}</div>
+        <div class="pod-pts">{{ usuarios_stats[0].total }}<span style="font-size:.75rem;font-weight:600;color:var(--gray)"> pts</span></div>
+        <div class="pod-sub">{{ usuarios_stats[0].exactos }} exactos</div>
+        <div class="pod-base"></div>
+      </div>
+      {% if usuarios_stats | length >= 3 %}
+      <div class="podio-item p3">
+        <div class="corona">🥉</div>
+        <div class="pod-nombre">{{ usuarios_stats[2].nombre }}</div>
+        <div class="pod-pts">{{ usuarios_stats[2].total }}<span style="font-size:.75rem;font-weight:600;color:var(--gray)"> pts</span></div>
+        <div class="pod-sub">{{ usuarios_stats[2].exactos }} exactos</div>
+        <div class="pod-base"></div>
+      </div>
+      {% endif %}
     </div>
   </div>
+  {% endif %}
 
-  {% if usuarios_stats %}
-  <!-- Gráfico: ranking usuarios -->
+  <!-- Gráfico ranking usuarios -->
   <div class="section">
-    <h2>🏆 Ranking de usuarios por puntos totales</h2>
-    <div class="chart-wrap" style="height:{{ [usuarios_stats|length * 40, 220]|max }}px">
+    <h2>📊 Puntos totales por jugador</h2>
+    <div class="chart-wrap" style="height:{{ [usuarios_stats|length * 44, 200]|max }}px">
       <canvas id="chartUsuarios"></canvas>
     </div>
   </div>
 
-  <!-- Gráfico: desglose usuarios -->
+  <!-- Gráfico desglose usuarios -->
   <div class="section">
-    <h2>👤 Desglose por usuario (exactos / resultados / fallidos)</h2>
-    <div class="chart-wrap" style="height:{{ [usuarios_stats|length * 40, 220]|max }}px">
+    <h2>🎯 Desglose de pronósticos por jugador</h2>
+    <div class="chart-wrap" style="height:{{ [usuarios_stats|length * 44, 200]|max }}px">
       <canvas id="chartDesglose"></canvas>
     </div>
   </div>
-  {% endif %}
+
+  <!-- Tabla detalle usuarios -->
+  <div class="section">
+    <h2>📋 Estadísticas por jugador</h2>
+    <div style="overflow-x:auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Jugador</th>
+            <th style="text-align:center">Jugados</th>
+            <th style="text-align:center">Puntos</th>
+            <th style="text-align:center">✅ Exactos</th>
+            <th style="text-align:center">🟡 Resultado</th>
+            <th style="text-align:center">❌ Fallidos</th>
+            <th style="min-width:110px">Distribución</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios_stats %}
+          {% set t = u.jugados or 1 %}
+          <tr>
+            <td style="color:var(--gray);font-size:.8rem;text-align:center">
+              {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+            </td>
+            <td style="font-weight:700">{{ u.nombre }}</td>
+            <td style="text-align:center">{{ u.jugados }}</td>
+            <td style="text-align:center;font-weight:900;color:var(--azul3);font-size:1rem">{{ u.total }}</td>
+            <td style="text-align:center">
+              <span class="badge badge-green">{{ u.exactos }} <span style="font-weight:400">({{ (u.exactos*100/t)|round(0)|int }}%)</span></span>
+            </td>
+            <td style="text-align:center">
+              <span class="badge badge-gold">{{ u.resultados }} <span style="font-weight:400">({{ (u.resultados*100/t)|round(0)|int }}%)</span></span>
+            </td>
+            <td style="text-align:center">
+              <span class="badge badge-red">{{ u.fallidos }} <span style="font-weight:400">({{ (u.fallidos*100/t)|round(0)|int }}%)</span></span>
+            </td>
+            <td>
+              <div class="bar-mini">
+                <div class="seg-green" style="width:{{ (u.exactos*100/t)|round(1) }}%"></div>
+                <div class="seg-gold"  style="width:{{ (u.resultados*100/t)|round(1) }}%"></div>
+                <div class="seg-red"   style="width:{{ (u.fallidos*100/t)|round(1) }}%"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% endif %}{# end if usuarios_stats #}
+
+  {% if partidos_stats %}
+  <!-- ══ SECCIÓN PARTIDOS ══ -->
+  <hr class="divider">
+  <div class="sec-titulo">⚽ Análisis de partidos</div>
+
+  <!-- Análisis de partidos destacados -->
+  {% set mas_facil = partidos_stats[0] %}
+  {% set mas_dificil = partidos_stats[-1] %}
+  <div class="insight-grid">
+    <div class="insight ins-green">
+      <div class="ins-lbl">😊 Partido más fácil</div>
+      <div class="ins-val">{{ mas_facil.label }}</div>
+      <div class="ins-sub">{{ mas_facil.pct_exacto }}% acertaron el marcador</div>
+    </div>
+    <div class="insight ins-red">
+      <div class="ins-lbl">😤 Partido más difícil</div>
+      <div class="ins-val">{{ mas_dificil.label }}</div>
+      <div class="ins-sub">Solo {{ mas_dificil.pct_exacto }}% acertaron el marcador</div>
+    </div>
+    <div class="insight ins-gold">
+      <div class="ins-lbl">🏆 Resultado más acertado</div>
+      {% set mejor_res = partidos_stats | sort(attribute='pct_resultado', reverse=True) | first %}
+      <div class="ins-val">{{ mejor_res.label }}</div>
+      <div class="ins-sub">{{ mejor_res.pct_resultado }}% acertaron el resultado</div>
+    </div>
+    <div class="insight">
+      <div class="ins-lbl">📊 Promedio exactos global</div>
+      <div class="ins-val">{{ pct_ex }}%</div>
+      <div class="ins-sub">de {{ g.total_prons or 0 }} pronósticos evaluados</div>
+    </div>
+  </div>
+
+  <!-- Gráfico % exacto por partido -->
+  <div class="section">
+    <h2>📊 % de marcador exacto por partido</h2>
+    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 240]|max }}px">
+      <canvas id="chartPartidos"></canvas>
+    </div>
+  </div>
+
+  <!-- Gráfico distribución por partido -->
+  <div class="section">
+    <h2>🔍 Distribución exacto / resultado / fallido por partido</h2>
+    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 240]|max }}px">
+      <canvas id="chartDistPartidos"></canvas>
+    </div>
+  </div>
 
   <!-- Tabla detalle partidos -->
   <div class="section">
@@ -186,19 +378,19 @@
           <tr>
             <th>#</th>
             <th>Partido</th>
-            <th>Resultado</th>
+            <th style="text-align:center">Resultado</th>
             <th>Fase</th>
-            <th>Total</th>
-            <th>✅ Exactos</th>
-            <th>🟡 Resultado</th>
-            <th>❌ Fallidos</th>
-            <th style="min-width:120px">Distribución</th>
+            <th style="text-align:center">Total</th>
+            <th style="text-align:center">✅ Exactos</th>
+            <th style="text-align:center">🟡 Resultado</th>
+            <th style="text-align:center">❌ Fallidos</th>
+            <th style="min-width:110px">Distribución</th>
           </tr>
         </thead>
         <tbody>
           {% for p in partidos_stats %}
           <tr>
-            <td style="color:var(--gray);font-size:.8rem">{{ loop.index }}</td>
+            <td style="color:var(--gray);font-size:.8rem;text-align:center">{{ loop.index }}</td>
             <td style="font-weight:700">
               {{ bandera_img(p.equipo_local, 16)|safe }} {{ p.equipo_local }}
               <span style="color:var(--gray);font-weight:400"> vs </span>
@@ -233,95 +425,84 @@
       </table>
     </div>
   </div>
-
-  {% if usuarios_stats %}
-  <!-- Tabla detalle usuarios -->
-  <div class="section">
-    <h2>👥 Detalle por usuario</h2>
-    <div style="overflow-x:auto">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Usuario</th>
-            <th>Jugados</th>
-            <th>Puntos</th>
-            <th>✅ Exactos</th>
-            <th>🟡 Resultado</th>
-            <th>❌ Fallidos</th>
-            <th style="min-width:120px">Distribución</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for u in usuarios_stats %}
-          {% set t = u.jugados or 1 %}
-          <tr>
-            <td style="color:var(--gray);font-size:.8rem">{{ loop.index }}</td>
-            <td style="font-weight:700">
-              {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% endif %}
-              {{ u.nombre }}
-            </td>
-            <td style="text-align:center">{{ u.jugados }}</td>
-            <td style="text-align:center;font-weight:900;color:var(--azul3)">{{ u.total }}</td>
-            <td style="text-align:center">
-              <span class="badge badge-green">{{ u.exactos }} ({{ (u.exactos*100/t)|round(0)|int }}%)</span>
-            </td>
-            <td style="text-align:center">
-              <span class="badge badge-gold">{{ u.resultados }} ({{ (u.resultados*100/t)|round(0)|int }}%)</span>
-            </td>
-            <td style="text-align:center">
-              <span class="badge badge-red">{{ u.fallidos }} ({{ (u.fallidos*100/t)|round(0)|int }}%)</span>
-            </td>
-            <td>
-              <div class="bar-mini">
-                <div class="seg-green" style="width:{{ (u.exactos*100/t)|round(1) }}%"></div>
-                <div class="seg-gold"  style="width:{{ (u.resultados*100/t)|round(1) }}%"></div>
-                <div class="seg-red"   style="width:{{ (u.fallidos*100/t)|round(1) }}%"></div>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
   {% endif %}
-
-  {% endif %}{# end if partidos_stats #}
 
 </div><!-- /container -->
 
 <script>
-/* ── Datos desde servidor ── */
-const pLabels  = {{ partidos_stats | map(attribute='label')       | list | tojson }};
-const pExacto  = {{ partidos_stats | map(attribute='pct_exacto')  | list | tojson }};
-const pResult  = {{ partidos_stats | map(attribute='pct_resultado')| list | tojson }};
-const pFallido = {{ partidos_stats | map(attribute='pct_fallido') | list | tojson }};
+const pLabels  = {{ partidos_stats | map(attribute='label')        | list | tojson }};
+const pExacto  = {{ partidos_stats | map(attribute='pct_exacto')   | list | tojson }};
+const pResult  = {{ partidos_stats | map(attribute='pct_resultado') | list | tojson }};
+const pFallido = {{ partidos_stats | map(attribute='pct_fallido')  | list | tojson }};
 
-const uLabels  = {{ usuarios_stats | map(attribute='nombre')    | list | tojson }};
-const uTotal   = {{ usuarios_stats | map(attribute='total')     | list | tojson }};
-const uExactos = {{ usuarios_stats | map(attribute='exactos')   | list | tojson }};
-const uResult  = {{ usuarios_stats | map(attribute='resultados')| list | tojson }};
-const uFallido = {{ usuarios_stats | map(attribute='fallidos')  | list | tojson }};
+const uLabels  = {{ usuarios_stats | map(attribute='nombre')     | list | tojson }};
+const uTotal   = {{ usuarios_stats | map(attribute='total')      | list | tojson }};
+const uExactos = {{ usuarios_stats | map(attribute='exactos')    | list | tojson }};
+const uResult  = {{ usuarios_stats | map(attribute='resultados') | list | tojson }};
+const uFallido = {{ usuarios_stats | map(attribute='fallidos')   | list | tojson }};
 
-const VERDE  = 'rgba(39,174,96,.85)';
-const ORO    = 'rgba(246,180,14,.85)';
-const ROJO   = 'rgba(231,76,60,.85)';
-const AZUL   = 'rgba(45,111,160,.85)';
-const OPTS_H = {
-  indexAxis: 'y',
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { callbacks: {
-    label: ctx => ` ${ctx.parsed.x}%`
-  }}},
-  scales: {
-    x: { max: 100, ticks: { callback: v => v + '%' }, grid: { color:'#e8f0fa' } },
-    y: { ticks: { font: { size: 11 } } }
-  }
-};
+const VERDE = 'rgba(39,174,96,.85)';
+const ORO   = 'rgba(246,180,14,.85)';
+const ROJO  = 'rgba(231,76,60,.85)';
+const AZUL  = 'rgba(45,111,160,.85)';
+const ORO1  = 'rgba(212,175,55,.95)';
+const PLATA = 'rgba(170,169,173,.95)';
+const BRON  = 'rgba(176,100,50,.95)';
 
-/* 1. % exacto por partido */
+/* Ranking usuarios */
+if (document.getElementById('chartUsuarios') && uLabels.length) {
+  new Chart(document.getElementById('chartUsuarios'), {
+    type: 'bar',
+    data: {
+      labels: uLabels,
+      datasets: [{
+        label: 'Puntos',
+        data: uTotal,
+        backgroundColor: uTotal.map((_, i) => i===0 ? ORO1 : i===1 ? PLATA : i===2 ? BRON : AZUL),
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} puntos` } }
+      },
+      scales: {
+        x: { grid: { color:'#e8f0fa' }, ticks: { font: { size: 11 } } },
+        y: { ticks: { font: { size: 12, weight: '700' } } }
+      }
+    }
+  });
+}
+
+/* Desglose usuarios */
+if (document.getElementById('chartDesglose') && uLabels.length) {
+  new Chart(document.getElementById('chartDesglose'), {
+    type: 'bar',
+    data: {
+      labels: uLabels,
+      datasets: [
+        { label: '✅ Exactos',   data: uExactos, backgroundColor: VERDE, borderRadius: 3 },
+        { label: '🟡 Resultado', data: uResult,  backgroundColor: ORO,   borderRadius: 3 },
+        { label: '❌ Fallidos',  data: uFallido, backgroundColor: ROJO,  borderRadius: 3 },
+      ]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x}` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { color:'#e8f0fa' } },
+        y: { stacked: true, ticks: { font: { size: 12 } } }
+      }
+    }
+  });
+}
+
+/* % exacto por partido */
 if (document.getElementById('chartPartidos')) {
   new Chart(document.getElementById('chartPartidos'), {
     type: 'bar',
@@ -330,26 +511,29 @@ if (document.getElementById('chartPartidos')) {
       datasets: [{
         label: '% Marcador exacto',
         data: pExacto,
-        backgroundColor: pExacto.map(v =>
-          v >= 50 ? VERDE : v >= 25 ? ORO : ROJO),
+        backgroundColor: pExacto.map(v => v >= 50 ? VERDE : v >= 25 ? ORO : ROJO),
         borderRadius: 5,
       }]
     },
-    options: { ...OPTS_H,
-      plugins: { ...OPTS_H.plugins,
-        legend: { display: true, labels: { boxWidth: 0,
-          generateLabels: () => [
-            { text: '≥ 50% exacto', fillStyle: VERDE },
-            { text: '25–49%',       fillStyle: ORO   },
-            { text: '< 25%',        fillStyle: ROJO  },
-          ]
-        }}
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 14, generateLabels: () => [
+          { text: '≥ 50%', fillStyle: VERDE },
+          { text: '25–49%', fillStyle: ORO },
+          { text: '< 25%', fillStyle: ROJO },
+        ]}},
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x}%` } }
+      },
+      scales: {
+        x: { max: 100, ticks: { callback: v => v+'%' }, grid: { color:'#e8f0fa' } },
+        y: { ticks: { font: { size: 11 } } }
       }
     }
   });
 }
 
-/* 2. Distribución por partido (stacked) */
+/* Distribución por partido */
 if (document.getElementById('chartDistPartidos')) {
   new Chart(document.getElementById('chartDistPartidos'), {
     type: 'bar',
@@ -362,71 +546,14 @@ if (document.getElementById('chartDistPartidos')) {
       ]
     },
     options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x}%` }}
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x}%` } }
       },
       scales: {
-        x: { stacked: true, max: 100, ticks: { callback: v => v + '%' }, grid: { color:'#e8f0fa' } },
+        x: { stacked: true, max: 100, ticks: { callback: v => v+'%' }, grid: { color:'#e8f0fa' } },
         y: { stacked: true, ticks: { font: { size: 11 } } }
-      }
-    }
-  });
-}
-
-/* 3. Ranking usuarios por puntos */
-if (document.getElementById('chartUsuarios') && uLabels.length) {
-  new Chart(document.getElementById('chartUsuarios'), {
-    type: 'bar',
-    data: {
-      labels: uLabels,
-      datasets: [{
-        label: 'Puntos totales',
-        data: uTotal,
-        backgroundColor: uTotal.map((v, i) =>
-          i === 0 ? 'rgba(212,175,55,.9)' : i === 1 ? 'rgba(170,169,173,.9)' : i === 2 ? 'rgba(176,100,50,.9)' : AZUL),
-        borderRadius: 5,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} pts` }}
-      },
-      scales: {
-        x: { grid: { color:'#e8f0fa' } },
-        y: { ticks: { font: { size: 12, weight: '600' } } }
-      }
-    }
-  });
-}
-
-/* 4. Desglose usuarios (stacked) */
-if (document.getElementById('chartDesglose') && uLabels.length) {
-  new Chart(document.getElementById('chartDesglose'), {
-    type: 'bar',
-    data: {
-      labels: uLabels,
-      datasets: [
-        { label: '✅ Exactos',    data: uExactos, backgroundColor: VERDE },
-        { label: '🟡 Resultado',  data: uResult,  backgroundColor: ORO   },
-        { label: '❌ Fallidos',   data: uFallido, backgroundColor: ROJO  },
-      ]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { position: 'top' },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x}` }}
-      },
-      scales: {
-        x: { stacked: true, grid: { color:'#e8f0fa' } },
-        y: { stacked: true, ticks: { font: { size: 12 } } }
       }
     }
   });
