@@ -722,14 +722,20 @@ def _reporte_data():
             m = re.match(r"(\d{1,2}/\d{1,2})", str(info["fecha"]))
             return m.group(1) if m else "S/F"
 
-        # Agrupar partidos por día (en orden de primera aparición)
-        day_pids, day_order = {}, []
+        # Agrupar partidos por día y ordenar cronológicamente (DD/MM)
+        day_pids = {}
         for pid in pid_order:
             day = _day(pid_info[pid])
-            if day not in day_pids:
-                day_pids[day] = []
-                day_order.append(day)
-            day_pids[day].append(pid)
+            day_pids.setdefault(day, []).append(pid)
+
+        def _day_key(d):
+            try:
+                dd, mm = d.split("/")
+                return (int(mm), int(dd))
+            except Exception:
+                return (99, 99)
+
+        day_order = sorted(day_pids.keys(), key=_day_key)
 
         evo_users = sorted({r["nombre"] for r in evo_rows})
         cumulative = {u: 0 for u in evo_users}

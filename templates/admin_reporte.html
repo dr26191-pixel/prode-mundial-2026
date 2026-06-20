@@ -509,9 +509,10 @@ if (document.getElementById('chartEvo') && evoLabels.length > 1) {
           labels: { font: { size: 12, weight: '600' }, boxWidth: 14, padding: 12 }
         },
         tooltip: {
+          itemSort: (a, b) => a.parsed.y - b.parsed.y,
           callbacks: {
-            title: items => `Partido: ${items[0].label}`,
-            label: ctx => ` ${ctx.dataset.label}: #${ctx.parsed.y}`
+            title: items => `📅 ${items[0].label}`,
+            label: ctx => ` #${ctx.parsed.y}  ${ctx.dataset.label}`
           }
         }
       },
