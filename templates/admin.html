@@ -264,11 +264,17 @@
         </div>
         <div class="form-field" style="flex:2">
           <label>Local</label>
-          <input type="text" name="local" placeholder="Ej. Argentina" required>
+          <select name="local" required>
+            <option value="" disabled selected>— Seleccionar —</option>
+            {% for equipo in equipos_lista %}<option>{{ equipo }}</option>{% endfor %}
+          </select>
         </div>
         <div class="form-field" style="flex:2">
           <label>Visitante</label>
-          <input type="text" name="visitante" placeholder="Ej. Brasil" required>
+          <select name="visitante" required>
+            <option value="" disabled selected>— Seleccionar —</option>
+            {% for equipo in equipos_lista %}<option>{{ equipo }}</option>{% endfor %}
+          </select>
         </div>
         <div class="form-field">
           <label>Fecha</label>

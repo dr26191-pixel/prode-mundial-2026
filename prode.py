@@ -582,7 +582,8 @@ def admin():
     except Exception:
         lotes = []
     return render_template("admin.html", partidos=partidos,
-                           participantes=participantes, lotes=lotes)
+                           participantes=participantes, lotes=lotes,
+                           equipos_lista=sorted(FLAG_CODES.keys()))
 
 @app.route("/admin/partido", methods=["POST"])
 def admin_partido():
