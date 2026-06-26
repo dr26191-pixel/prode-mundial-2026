@@ -589,10 +589,11 @@ def admin():
 def admin_partido():
     if not session.get("admin"): return redirect(url_for("admin"))
     p = placeholder()
+    lote = int(request.form.get("lote") or 1)
     db_execute(
-        f"INSERT INTO partidos (fase, equipo_local, equipo_visit, fecha) VALUES ({p},{p},{p},{p})",
+        f"INSERT INTO partidos (fase, equipo_local, equipo_visit, fecha, lote) VALUES ({p},{p},{p},{p},{p})",
         (request.form["fase"], request.form["local"],
-         request.form["visitante"], request.form["fecha"]))
+         request.form["visitante"], request.form["fecha"], lote))
     db_commit()
     return redirect(url_for("admin"))
 

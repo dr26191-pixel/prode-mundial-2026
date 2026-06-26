@@ -280,6 +280,12 @@
           <label>Fecha</label>
           <input type="text" name="fecha" placeholder="14/06 Grupo A">
         </div>
+        <div class="form-field" style="max-width:80px">
+          <label>Lote</label>
+          <select name="lote">
+            {% for l in lotes %}<option value="{{ l.numero }}">{{ l.numero }} – {{ l.nombre }}</option>{% endfor %}
+          </select>
+        </div>
         <div style="align-self:flex-end">
           <button class="btn btn-azul" type="submit">Agregar</button>
         </div>
