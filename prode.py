@@ -221,9 +221,12 @@ def init_db():
                 publicado INTEGER DEFAULT 0
             )
         """)
-        # Agregar columna lote si la tabla ya existe sin ella
+        # Agregar columnas si la tabla ya existe sin ellas
         cur.execute(
             "ALTER TABLE partidos ADD COLUMN IF NOT EXISTS lote INTEGER DEFAULT 1"
+        )
+        cur.execute(
+            "ALTER TABLE partidos ADD COLUMN IF NOT EXISTS oculto INTEGER DEFAULT 0"
         )
         conn.commit()
         conn.close()
@@ -262,12 +265,15 @@ def init_db():
                 publicado INTEGER DEFAULT 0
             );
         """)
-        # Agregar columna lote a tabla existente si no tiene la columna
-        try:
-            conn.execute("ALTER TABLE partidos ADD COLUMN lote INTEGER DEFAULT 1")
-            conn.commit()
-        except Exception:
-            pass  # ya existe
+        for col_sql in [
+            "ALTER TABLE partidos ADD COLUMN lote INTEGER DEFAULT 1",
+            "ALTER TABLE partidos ADD COLUMN oculto INTEGER DEFAULT 0",
+        ]:
+            try:
+                conn.execute(col_sql)
+                conn.commit()
+            except Exception:
+                pass  # ya existe
         conn.commit()
         conn.close()
 
@@ -290,11 +296,11 @@ def index():
         lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
         ph = placeholder()
         if lote_max < 99:
-            # Mostrar solo el lote activo (el publicado más alto)
+            # Mostrar solo el lote activo (el publicado más alto), sin ocultos
             partidos = fetchall(db_execute(
-                f"SELECT * FROM partidos WHERE lote = {ph} ORDER BY fecha, id", (lote_max,)))
+                f"SELECT * FROM partidos WHERE lote = {ph} AND COALESCE(oculto,0)=0 ORDER BY fecha, id", (lote_max,)))
         else:
-            partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+            partidos = fetchall(db_execute("SELECT * FROM partidos WHERE COALESCE(oculto,0)=0 ORDER BY fecha, id"))
     except Exception:
         partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
     for partido in partidos:
@@ -610,6 +616,16 @@ def admin_resultado():
             f"SELECT * FROM pronosticos WHERE partido_id={p}", (pid,))):
         pts = calcular_puntos(pron["goles_local"], pron["goles_visit"], gl, gv)
         db_execute(f"UPDATE pronosticos SET puntos={p} WHERE id={p}", (pts, pron["id"]))
+    db_commit()
+    return redirect(url_for("admin"))
+
+@app.route("/admin/ocultar-partido/<int:pid>", methods=["POST"])
+def ocultar_partido(pid):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    p = placeholder()
+    partido = fetchone(db_execute(f"SELECT oculto FROM partidos WHERE id={p}", (pid,)))
+    nuevo = 0 if (partido and partido.get("oculto")) else 1
+    db_execute(f"UPDATE partidos SET oculto={p} WHERE id={p}", (nuevo, pid))
     db_commit()
     return redirect(url_for("admin"))
 

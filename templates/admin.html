@@ -238,6 +238,13 @@
             </div>
             <button class="btn btn-gold btn-sm" type="submit">✔ Guardar</button>
           </form>
+          <form action="/admin/ocultar-partido/{{ p.id }}" method="POST">
+            <button class="btn btn-sm" type="submit"
+              style="background:{{ '#e67e22' if p.oculto else '#8e8e8e' }};color:#fff"
+              title="{{ 'Mostrar partido' if p.oculto else 'Ocultar partido' }}">
+              {{ '👁' if p.oculto else '🙈' }}
+            </button>
+          </form>
           <form action="/admin/borrar-partido/{{ p.id }}" method="POST"
                 onsubmit="return confirm('¿Borrar {{ p.equipo_local }} vs {{ p.equipo_visit }}?')">
             <button class="btn btn-red btn-sm" type="submit">🗑</button>
