@@ -857,6 +857,19 @@ def sync_sheets():
     return redirect(url_for("admin"))
 
 
+@app.route("/admin/lote/<int:n>")
+def admin_ver_lote(n):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    partidos = fetchall(db_execute(
+        f"SELECT id, fase, equipo_local, equipo_visit, fecha, goles_local, goles_visit, lote FROM partidos WHERE lote={placeholder()} ORDER BY id",
+        (n,)))
+    from flask import Response
+    lines = [f"Lote {n} — {len(partidos)} partido(s)\n"]
+    for p in partidos:
+        res = f"{p['goles_local']}-{p['goles_visit']}" if p['goles_local'] is not None else "sin resultado"
+        lines.append(f"  [{p['id']}] {p['fase']} | {p['equipo_local']} vs {p['equipo_visit']} | {p['fecha']} | {res}")
+    return Response("\n".join(lines), mimetype="text/plain")
+
 @app.route("/admin/sync-resultados")
 def sync_resultados():
     if not session.get("admin"): return redirect(url_for("admin"))
