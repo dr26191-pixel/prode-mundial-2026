@@ -258,14 +258,12 @@
 
     <div class="nombre-card">
       <label for="nombre">Tu nombre</label>
-      <input id="nombre" name="nombre" type="text" list="usuarios-list"
-             placeholder="Escribí o elegí tu nombre"
-             value="{{ nombre_param }}" required autocomplete="off">
-      <datalist id="usuarios-list">
+      <select id="nombre" name="nombre" required>
+        <option value="">— Elegí tu nombre —</option>
         {% for u in usuarios_existentes %}
-        <option value="{{ u }}">
+        <option value="{{ u }}"{% if u == nombre_param %} selected{% endif %}>{{ u }}</option>
         {% endfor %}
-      </datalist>
+      </select>
     </div>
 
     {% set ordered_labels = [
