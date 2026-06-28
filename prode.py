@@ -277,6 +277,17 @@ def init_db():
         conn.commit()
         conn.close()
 
+# ── Utilidades ────────────────────────────────────────────────────
+
+import re as _re
+
+def _fecha_sort_key(p):
+    m = _re.match(r"(\d{1,2})/(\d{1,2})", str(p.get("fecha") or ""))
+    return (int(m.group(2)), int(m.group(1)), p.get("id", 0)) if m else (99, 99, p.get("id", 0))
+
+def _partidos_sorted(rows):
+    return sorted(rows, key=_fecha_sort_key)
+
 # ── Puntos ────────────────────────────────────────────────────────
 
 def calcular_puntos(pl, pv, rl, rv):
@@ -296,13 +307,14 @@ def index():
         lote_max = lote_row["m"] if (lote_row and lote_row["m"] is not None) else 99
         ph = placeholder()
         if lote_max < 99:
-            # Mostrar solo el lote activo (el publicado más alto), sin ocultos
-            partidos = fetchall(db_execute(
-                f"SELECT * FROM partidos WHERE lote = {ph} AND COALESCE(oculto,0)=0 ORDER BY fecha, id", (lote_max,)))
+            partidos = _partidos_sorted(fetchall(db_execute(
+                f"SELECT * FROM partidos WHERE lote = {ph} AND COALESCE(oculto,0)=0", (lote_max,))))
         else:
-            partidos = fetchall(db_execute("SELECT * FROM partidos WHERE COALESCE(oculto,0)=0 ORDER BY fecha, id"))
+            partidos = _partidos_sorted(fetchall(db_execute(
+                "SELECT * FROM partidos WHERE COALESCE(oculto,0)=0")))
     except Exception:
-        partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+        partidos = _partidos_sorted(fetchall(db_execute(
+            f"SELECT * FROM partidos WHERE lote = {placeholder()}", (lote_max,))))
     for partido in partidos:
         partido["bloqueado"] = partido_bloqueado(partido)
 
@@ -449,10 +461,10 @@ def todos():
 
     try:
         ph = placeholder()
-        todos_partidos = fetchall(db_execute(
-            f"SELECT * FROM partidos WHERE lote <= {ph} ORDER BY fecha, id", (lote_max,)))
+        todos_partidos = _partidos_sorted(fetchall(db_execute(
+            f"SELECT * FROM partidos WHERE lote <= {ph}", (lote_max,))))
     except Exception:
-        todos_partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+        todos_partidos = _partidos_sorted(fetchall(db_execute("SELECT * FROM partidos")))
 
     for p in todos_partidos:
         p["fase_label"] = lote_label(p)
@@ -580,7 +592,7 @@ def admin():
     msg = _do_sync_resultados()
     if msg:
         flash(msg)
-    partidos = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    partidos = _partidos_sorted(fetchall(db_execute("SELECT * FROM partidos")))
     participantes = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
     try:
