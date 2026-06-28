@@ -878,15 +878,31 @@ def sync_sheets():
 @app.route("/admin/lote/<int:n>")
 def admin_ver_lote(n):
     if not session.get("admin"): return redirect(url_for("admin"))
-    partidos = fetchall(db_execute(
-        f"SELECT id, fase, equipo_local, equipo_visit, fecha, goles_local, goles_visit, lote FROM partidos WHERE lote={placeholder()} ORDER BY id",
-        (n,)))
+    try:
+        partidos = fetchall(db_execute(
+            f"SELECT id, fase, equipo_local, equipo_visit, fecha, goles_local, goles_visit, lote, COALESCE(oculto,0) AS oculto FROM partidos WHERE lote={placeholder()} ORDER BY id",
+            (n,)))
+    except Exception:
+        partidos = fetchall(db_execute(
+            f"SELECT id, fase, equipo_local, equipo_visit, fecha, goles_local, goles_visit, lote FROM partidos WHERE lote={placeholder()} ORDER BY id",
+            (n,)))
     from flask import Response
-    lines = [f"Lote {n} — {len(partidos)} partido(s)\n"]
+    visibles = sum(1 for p in partidos if not p.get("oculto"))
+    lines = [f"Lote {n} — {len(partidos)} partido(s), {visibles} visibles en el indice\n"]
     for p in partidos:
         res = f"{p['goles_local']}-{p['goles_visit']}" if p['goles_local'] is not None else "sin resultado"
-        lines.append(f"  [{p['id']}] {p['fase']} | {p['equipo_local']} vs {p['equipo_visit']} | {p['fecha']} | {res}")
+        oculto_flag = " [OCULTO]" if p.get("oculto") else ""
+        lines.append(f"  [{p['id']}]{oculto_flag} {p['fase']} | {p['equipo_local']} vs {p['equipo_visit']} | {p['fecha']} | {res}")
     return Response("\n".join(lines), mimetype="text/plain")
+
+@app.route("/admin/mostrar-todos-lote/<int:n>", methods=["POST"])
+def mostrar_todos_lote(n):
+    if not session.get("admin"): return redirect(url_for("admin"))
+    p = placeholder()
+    db_execute(f"UPDATE partidos SET oculto=0 WHERE lote={p}", (n,))
+    db_commit()
+    flash(f"Todos los partidos del lote {n} son ahora visibles.")
+    return redirect(url_for("admin"))
 
 @app.route("/admin/sync-resultados")
 def sync_resultados():
