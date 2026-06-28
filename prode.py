@@ -330,13 +330,16 @@ def index():
 
     todos_usuarios = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
-    try:
-        ph = placeholder()
-        ya_cargaron = {r["nombre"] for r in fetchall(db_execute(
-            f"SELECT DISTINCT pr.nombre FROM pronosticos pr"
-            f" JOIN partidos pa ON pa.id = pr.partido_id WHERE pa.lote = {ph}",
-            (lote_max,)))}
-    except Exception:
+    partido_ids = [p["id"] for p in partidos]
+    if partido_ids:
+        ph_list = ",".join([placeholder() for _ in partido_ids])
+        try:
+            ya_cargaron = {r["nombre"] for r in fetchall(db_execute(
+                f"SELECT DISTINCT nombre FROM pronosticos WHERE partido_id IN ({ph_list})",
+                tuple(partido_ids)))}
+        except Exception:
+            ya_cargaron = set()
+    else:
         ya_cargaron = set()
     usuarios_existentes = [u for u in todos_usuarios if u not in ya_cargaron]
 
