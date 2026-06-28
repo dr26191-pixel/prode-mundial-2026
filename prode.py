@@ -374,7 +374,7 @@ def pronostico():
 @app.route("/mis-pronosticos/<nombre>")
 def mis_pronosticos(nombre):
     p = placeholder()
-    partidos  = fetchall(db_execute("SELECT * FROM partidos ORDER BY fecha, id"))
+    partidos  = _partidos_sorted(fetchall(db_execute("SELECT * FROM partidos")))
     pron_rows = fetchall(db_execute(
         f"SELECT * FROM pronosticos WHERE nombre={p}", (nombre,)))
     pron = {r["partido_id"]: r for r in pron_rows}
