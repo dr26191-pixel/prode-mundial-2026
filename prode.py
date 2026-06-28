@@ -781,10 +781,41 @@ def _reporte_data():
                 evo_ranks[u].append(order.index(u) + 1)
             evo_labels.append(day)
 
-    return g_row, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks
+    # ── Puntos por usuario × fase ─────────────────────────────────
+    FASE_ORDER = ['Grupos', 'Dieciseisavos', 'Octavos', 'Cuartos',
+                  'Semifinal', 'Tercer puesto', 'Final']
+    fase_rows = fetchall(db_execute("""
+        SELECT pr.nombre, pa.fase,
+               COALESCE(SUM(pr.puntos), 0) AS pts,
+               SUM(CASE WHEN pr.puntos=3 THEN 1 ELSE 0 END) AS exactos,
+               SUM(CASE WHEN pr.puntos=1 THEN 1 ELSE 0 END) AS resultados
+        FROM pronosticos pr
+        JOIN partidos pa ON pa.id = pr.partido_id
+        WHERE pr.puntos IS NOT NULL
+        GROUP BY pr.nombre, pa.fase
+    """))
+    fases_set = {r["fase"] for r in fase_rows}
+    fases_ordered = [f for f in FASE_ORDER if f in fases_set] + \
+                    [f for f in sorted(fases_set) if f not in FASE_ORDER]
+    fases_by_user = {}
+    for row in fase_rows:
+        fases_by_user.setdefault(row["nombre"], {})[row["fase"]] = {
+            "pts": row["pts"], "exactos": row["exactos"], "resultados": row["resultados"]
+        }
+    # Build sorted rows (same order as usuarios_stats)
+    nombres_order = [u["nombre"] for u in usuarios_stats]
+    etapas_rows = [{"nombre": n, "fases": fases_by_user.get(n, {})} for n in nombres_order]
+    # Column totals for footer
+    fases_totales = {f: sum(r["fases"].get(f, {}).get("pts", 0) for r in etapas_rows)
+                     for f in fases_ordered}
+    gran_total = sum(fases_totales.values())
+
+    return g_row, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks, \
+           fases_ordered, etapas_rows, fases_totales, gran_total
 
 def _render_reporte(**extra):
-    g, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks = _reporte_data()
+    g, partidos_stats, usuarios_stats, evo_labels, evo_users, evo_ranks, \
+        fases_ordered, etapas_rows, fases_totales, gran_total = _reporte_data()
     return render_template("admin_reporte.html",
                            g=g,
                            partidos_stats=partidos_stats,
@@ -792,6 +823,10 @@ def _render_reporte(**extra):
                            evo_labels=evo_labels,
                            evo_users=evo_users,
                            evo_ranks=evo_ranks,
+                           fases_ordered=fases_ordered,
+                           etapas_rows=etapas_rows,
+                           fases_totales=fases_totales,
+                           gran_total=gran_total,
                            **extra)
 
 @app.route("/reporte")

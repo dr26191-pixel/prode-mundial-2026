@@ -186,6 +186,54 @@
   </div>
   {% else %}
 
+  <!-- ══ SECCIÓN ETAPAS ══ -->
+  {% if fases_ordered %}
+  <div class="sec-titulo">📋 Puntos por etapa</div>
+  <div class="section" style="overflow-x:auto">
+    <table class="tbl" style="min-width:500px">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Jugador</th>
+          {% for fase in fases_ordered %}
+          <th style="text-align:center;white-space:nowrap">{{ fase }}</th>
+          {% endfor %}
+          <th style="text-align:center;background:#1a4f7a">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in etapas_rows %}
+        {% set total = row.fases.values() | map(attribute='pts') | sum %}
+        <tr>
+          <td style="color:var(--gray);font-size:.8rem;text-align:center">
+            {% if loop.index == 1 %}🥇{% elif loop.index == 2 %}🥈{% elif loop.index == 3 %}🥉{% else %}{{ loop.index }}{% endif %}
+          </td>
+          <td style="font-weight:700">{{ row.nombre }}</td>
+          {% for fase in fases_ordered %}
+          {% set fd = row.fases.get(fase) %}
+          <td style="text-align:center">
+            {% if fd %}
+            <span title="{{ fd.exactos }} exactos · {{ fd.resultados }} resultado">{{ fd.pts }}</span>
+            {% else %}<span style="color:#ccc">–</span>{% endif %}
+          </td>
+          {% endfor %}
+          <td style="text-align:center;font-weight:900;color:var(--azul3);font-size:1rem;background:#f0f7ff">{{ total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr style="background:#e8f3ff;font-weight:700">
+          <td colspan="2" style="text-align:right;font-size:.78rem;color:var(--gray)">Total del grupo</td>
+          {% for fase in fases_ordered %}
+          <td style="text-align:center;color:var(--azul3)">{{ fases_totales[fase] }}</td>
+          {% endfor %}
+          <td style="text-align:center;font-weight:900;color:var(--azul3)">{{ gran_total }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% endif %}
+
   <!-- ══ SECCIÓN USUARIOS ══ -->
   <div class="sec-titulo">👥 Ranking de jugadores</div>
 
