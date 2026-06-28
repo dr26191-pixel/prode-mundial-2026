@@ -328,8 +328,17 @@ def index():
             (nombre_param,)))
         previos = {r["partido_id"]: r for r in rows}
 
-    usuarios_existentes = [r["nombre"] for r in fetchall(db_execute(
+    todos_usuarios = [r["nombre"] for r in fetchall(db_execute(
         "SELECT DISTINCT nombre FROM pronosticos ORDER BY nombre"))]
+    try:
+        ph = placeholder()
+        ya_cargaron = {r["nombre"] for r in fetchall(db_execute(
+            f"SELECT DISTINCT pr.nombre FROM pronosticos pr"
+            f" JOIN partidos pa ON pa.id = pr.partido_id WHERE pa.lote = {ph}",
+            (lote_max,)))}
+    except Exception:
+        ya_cargaron = set()
+    usuarios_existentes = [u for u in todos_usuarios if u not in ya_cargaron]
 
     return render_template("index.html", partidos=partidos,
                            abierto=pronosticos_abiertos(), fecha_cierre=FECHA_CIERRE,
