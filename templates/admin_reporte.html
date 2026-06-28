@@ -416,22 +416,6 @@
     </div>
   </div>
 
-  <!-- Gráfico % exacto por partido -->
-  <div class="section">
-    <h2>📊 % de marcador exacto por partido</h2>
-    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 240]|max }}px">
-      <canvas id="chartPartidos"></canvas>
-    </div>
-  </div>
-
-  <!-- Gráfico distribución por partido -->
-  <div class="section">
-    <h2>🔍 Distribución exacto / resultado / fallido por partido</h2>
-    <div class="chart-wrap" style="height:{{ [partidos_stats|length * 36, 240]|max }}px">
-      <canvas id="chartDistPartidos"></canvas>
-    </div>
-  </div>
-
   <!-- Tabla detalle partidos -->
   <div class="section">
     <h2>📋 Detalle por partido</h2>
@@ -635,62 +619,6 @@ if (document.getElementById('chartDesglose') && uLabels.length) {
   });
 }
 
-/* % exacto por partido */
-if (document.getElementById('chartPartidos')) {
-  new Chart(document.getElementById('chartPartidos'), {
-    type: 'bar',
-    data: {
-      labels: pLabels,
-      datasets: [{
-        label: '% Marcador exacto',
-        data: pExacto,
-        backgroundColor: pExacto.map(v => v >= 50 ? VERDE : v >= 25 ? ORO : ROJO),
-        borderRadius: 5,
-      }]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, labels: { boxWidth: 14, generateLabels: () => [
-          { text: '≥ 50%', fillStyle: VERDE },
-          { text: '25–49%', fillStyle: ORO },
-          { text: '< 25%', fillStyle: ROJO },
-        ]}},
-        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x}%` } }
-      },
-      scales: {
-        x: { max: 100, ticks: { callback: v => v+'%' }, grid: { color:'#e8f0fa' } },
-        y: { ticks: { font: { size: 11 } } }
-      }
-    }
-  });
-}
-
-/* Distribución por partido */
-if (document.getElementById('chartDistPartidos')) {
-  new Chart(document.getElementById('chartDistPartidos'), {
-    type: 'bar',
-    data: {
-      labels: pLabels,
-      datasets: [
-        { label: '✅ Exacto',    data: pExacto,  backgroundColor: VERDE },
-        { label: '🟡 Resultado', data: pResult,  backgroundColor: ORO   },
-        { label: '❌ Fallido',   data: pFallido, backgroundColor: ROJO  },
-      ]
-    },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x}%` } }
-      },
-      scales: {
-        x: { stacked: true, max: 100, ticks: { callback: v => v+'%' }, grid: { color:'#e8f0fa' } },
-        y: { stacked: true, ticks: { font: { size: 11 } } }
-      }
-    }
-  });
-}
 </script>
 </body>
 </html>
