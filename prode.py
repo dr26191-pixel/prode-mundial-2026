@@ -587,8 +587,10 @@ def admin():
         lotes = fetchall(db_execute("SELECT * FROM lotes ORDER BY numero"))
     except Exception:
         lotes = []
+    lote_activo = max((l["numero"] for l in lotes if l.get("publicado")), default=1)
     return render_template("admin.html", partidos=partidos,
                            participantes=participantes, lotes=lotes,
+                           lote_activo=lote_activo,
                            equipos_lista=sorted(FLAG_CODES.keys()))
 
 @app.route("/admin/partido", methods=["POST"])

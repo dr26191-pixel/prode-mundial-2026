@@ -290,7 +290,7 @@
         <div class="form-field" style="max-width:80px">
           <label>Lote</label>
           <select name="lote">
-            {% for l in lotes %}<option value="{{ l.numero }}">{{ l.numero }} – {{ l.nombre }}</option>{% endfor %}
+            {% for l in lotes %}<option value="{{ l.numero }}"{{ ' selected' if l.numero == lote_activo else '' }}>{{ l.numero }} – {{ l.nombre }}</option>{% endfor %}
           </select>
         </div>
         <div style="align-self:flex-end">

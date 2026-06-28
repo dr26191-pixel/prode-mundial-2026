@@ -270,7 +270,13 @@
         'Jornada 1 – Grupos','Jornada 2 – Grupos','Jornada 3 – Grupos',
         'Dieciseisavos','Octavos','Cuartos','Semifinal','Tercer puesto','Final'
     ] %}
-    {% for label in ordered_labels %}
+    {# Agregar cualquier fase extra que no esté en la lista predefinida #}
+    {% set extra_labels = [] %}
+    {% for p in partidos %}
+      {% set lbl = lote_label(p) %}
+      {% if lbl not in ordered_labels and lbl not in extra_labels %}{% set _ = extra_labels.append(lbl) %}{% endif %}
+    {% endfor %}
+    {% for label in (ordered_labels + extra_labels) %}
       {% set partidos_label = [] %}
       {% for p in partidos %}{% if lote_label(p) == label %}{% set _ = partidos_label.append(p) %}{% endif %}{% endfor %}
       {% if partidos_label %}
