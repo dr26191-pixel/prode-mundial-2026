@@ -146,8 +146,17 @@
     <h2>🔄 Resultados automáticos</h2>
     <p style="font-size:.84rem;color:var(--gray);margin-bottom:12px;">
       Trae resultados finales desde football-data.org y recalcula puntos. Requiere <code>FOOTBALL_DATA_KEY</code> en Render.
+      {% if sync_pausado %}
+      <strong style="color:#e67e22">⏸ Pausado: no se sincroniza automáticamente al abrir este panel.</strong>
+      {% endif %}
     </p>
     <a href="/admin/sync-resultados" class="btn btn-azul">🔄 Sincronizar resultados reales</a>
+    <form action="/admin/toggle-sync" method="POST" style="display:inline-block;margin-left:8px">
+      <button type="submit" class="btn btn-sm"
+        style="background:{{ '#27ae60' if sync_pausado else '#e67e22' }};color:#fff">
+        {{ '▶ Reanudar carga automática' if sync_pausado else '⏸ Pausar carga automática' }}
+      </button>
+    </form>
   </div>
 
   <!-- ── Reporte estadísticas ── -->

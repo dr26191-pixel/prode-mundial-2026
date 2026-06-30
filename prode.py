@@ -221,6 +221,12 @@ def init_db():
                 publicado INTEGER DEFAULT 0
             )
         """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS config (
+                clave TEXT PRIMARY KEY,
+                valor TEXT
+            )
+        """)
         # Agregar columnas si la tabla ya existe sin ellas
         cur.execute(
             "ALTER TABLE partidos ADD COLUMN IF NOT EXISTS lote INTEGER DEFAULT 1"
@@ -264,6 +270,10 @@ def init_db():
                 fechas    TEXT,
                 publicado INTEGER DEFAULT 0
             );
+            CREATE TABLE IF NOT EXISTS config (
+                clave TEXT PRIMARY KEY,
+                valor TEXT
+            );
         """)
         for col_sql in [
             "ALTER TABLE partidos ADD COLUMN lote INTEGER DEFAULT 1",
@@ -287,6 +297,30 @@ def _fecha_sort_key(p):
 
 def _partidos_sorted(rows):
     return sorted(rows, key=_fecha_sort_key)
+
+def get_config(clave, default=None):
+    p = placeholder()
+    try:
+        row = fetchone(db_execute(f"SELECT valor FROM config WHERE clave={p}", (clave,)))
+        return row["valor"] if row else default
+    except Exception:
+        return default
+
+def set_config(clave, valor):
+    p = placeholder()
+    try:
+        if DATABASE_URL:
+            db_execute(
+                f"INSERT INTO config (clave, valor) VALUES ({p},{p}) "
+                f"ON CONFLICT (clave) DO UPDATE SET valor=EXCLUDED.valor", (clave, valor))
+        else:
+            db_execute(f"INSERT OR REPLACE INTO config (clave, valor) VALUES ({p},{p})", (clave, valor))
+        db_commit()
+    except Exception:
+        pass
+
+def sync_pausado():
+    return get_config("sync_pausado", "0") == "1"
 
 # ── Puntos ────────────────────────────────────────────────────────
 
@@ -523,6 +557,8 @@ def _do_sync_resultados():
     """Trae partidos terminados de football-data.org y actualiza DB. Retorna mensaje."""
     if not FOOTBALL_DATA_KEY:
         return None
+    if sync_pausado():
+        return None
     try:
         req = urllib.request.Request(
             "https://api.football-data.org/v4/competitions/WC/matches?status=FINISHED",
@@ -603,7 +639,8 @@ def admin():
     return render_template("admin.html", partidos=partidos,
                            participantes=participantes, lotes=lotes,
                            lote_activo=lote_activo,
-                           equipos_lista=sorted(FLAG_CODES.keys()))
+                           equipos_lista=sorted(FLAG_CODES.keys()),
+                           sync_pausado=sync_pausado())
 
 @app.route("/admin/partido", methods=["POST"])
 def admin_partido():
@@ -957,9 +994,20 @@ def sync_resultados():
     if not FOOTBALL_DATA_KEY:
         flash("Configurá la variable FOOTBALL_DATA_KEY en Render para usar esta función.")
         return redirect(url_for("admin"))
+    if sync_pausado():
+        flash("La carga automática de resultados web está pausada. Reanudala para sincronizar.")
+        return redirect(url_for("admin"))
     msg = _do_sync_resultados()
     if msg:
         flash(msg)
+    return redirect(url_for("admin"))
+
+@app.route("/admin/toggle-sync", methods=["POST"])
+def toggle_sync():
+    if not session.get("admin"): return redirect(url_for("admin"))
+    nuevo = "0" if sync_pausado() else "1"
+    set_config("sync_pausado", nuevo)
+    flash("Carga de resultados web pausada." if nuevo == "1" else "Carga de resultados web reanudada.")
     return redirect(url_for("admin"))
 
 
